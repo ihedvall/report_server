@@ -1,3 +1,5 @@
+# Copyright 2021 Ingemar Hedvall
+# SPDX-License-Identifier: MIT
 set(EXPAT_ROOT "k:/expat/master" CACHE PATH "The Expat library is required for the build")
 if (NOT EXPAT_FOUND)
     find_package(EXPAT REQUIRED)

@@ -1,3 +1,5 @@
+# Copyright 2021 Ingemar Hedvall
+# SPDX-License-Identifier: MIT
 set(OPENSSL_ROOT "c:/msys64/mingw64" CACHE PATH "OpenSSL is required for calculating checksum (MD5)")
 if (NOT OPENSSL_FOUND)
     set(OPENSSL_USE_STATIC_LIBS TRUE)

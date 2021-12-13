@@ -1,3 +1,7 @@
+/*
+ * Copyright 2021 Ingemar Hedvall
+ * SPDX-License-Identifier: MIT
+ */
 #include <sstream>
 #include "childframe.h"
 #include "mdfdocument.h"

@@ -1,3 +1,5 @@
+# Copyright 2021 Ingemar Hedvall
+# SPDX-License-Identifier: MIT
 set(ZLIB_ROOT "k:/zlib/master" CACHE PATH "ZLIB is required to build the libmdf and the libutil packages")
 if (NOT ZLIB_FOUND)
     find_package(ZLIB REQUIRED )

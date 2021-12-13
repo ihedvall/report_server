@@ -1,3 +1,5 @@
+# Copyright 2021 Ingemar Hedvall
+# SPDX-License-Identifier: MIT
 set(wxWidgets_ROOT_DIR "K:/wxwidgets/master" CACHE PATH "wxWidgets is required to build GUI applications")
 set(wxWidgets_LIB_DIR "K:/wxwidgets/master/lib/gcc_x64_lib" CACHE PATH "wxWidgets have some problem to find its libraries" FORCE)
 

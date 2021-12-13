@@ -1,3 +1,7 @@
+/*
+ * Copyright 2021 Ingemar Hedvall
+ * SPDX-License-Identifier: MIT
+ */
 #pragma once
 namespace mdf::viewer {
 constexpr wxWindowID kIdLeftTree = 1;

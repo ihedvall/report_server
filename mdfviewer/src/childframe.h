@@ -1,3 +1,7 @@
+/*
+ * Copyright 2021 Ingemar Hedvall
+ * SPDX-License-Identifier: MIT
+ */
 #pragma once
 #include <wx/wx.h>
 #include <wx/docmdi.h>

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2021 Ingemar Hedvall
+ * SPDX-License-Identifier: MIT
+ */
 #include <wx/docmdi.h>
 #include "mdfview.h"
 #include "mdfviewer.h"

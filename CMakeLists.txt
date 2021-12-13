@@ -1,3 +1,5 @@
+# Copyright 2021 Ingemar Hedvall
+# SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.20)
 
 project(ReportServer
