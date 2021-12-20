@@ -14,7 +14,7 @@ The project is a rather complex consisting of several libraries and applications
 - Application ODS Modeler. The application configure ASAM ODS database models.
 - Application Measurement Manager. The application manage multiple measurement files.
 
-<<<<<<< HEAD
+
 The project is currently under development.
 
 ## Building the project
@@ -29,11 +29,12 @@ needs to be downloaded and built.
 - Doxygen's application. Is required if the documentation should be built.
 - Google Test Library. Is required for running and build the unit tests.
 - wxWidgets Library. Is required for the GUI applications to build. Set both 
+- NSIS Installer. Needed to build an installer executable for Windows.
 the 'wxWidgets_ROOT_DIR' and the 'wxWidgets_LIB_DIR' variables.
 
 ## License
 
 The project uses the MIT license. See external LICENSE file in project root.
-=======
+
 The project is currently under development.
->>>>>>> b0fb5db134066228124ebd128d6b768f26188a72
+

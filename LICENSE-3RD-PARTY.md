@@ -11,20 +11,6 @@ SPDX-License-Identifier: BSL-1.0
 
 https://www.boost.org/LICENSE_1_0.txt
 
-### Doxygen
-
-Software documentation tool.
-
-License: https://www.doxygen.nl/index.html
-
-### Google Test
-
-Unit test libraries.
-
-SPDX-License-Identifier: BSD-3-Clause
-
-https://opensource.org/licenses/BSD-3-Clause
-
 ### Expat
 
 C library for parsing XML
@@ -67,9 +53,26 @@ https://www.zlib.net/zlib_license.html
 
 https://opensource.org/licenses/Zlib
 
+## Build Applications
 
+### Doxygen
 
+Software documentation tool.
 
+https://www.doxygen.nl/index.html
 
+### Google Test
+
+Unit test libraries.
+
+SPDX-License-Identifier: BSD-3-Clause
+
+https://opensource.org/licenses/BSD-3-Clause
+
+### NSIS - Nullsoft Scriptable Install System 
+
+Windows and Unix installers.
+
+https://nsis.sourceforge.io/Main_Page
 
 

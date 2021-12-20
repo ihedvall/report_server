@@ -36,3 +36,4 @@ add_subdirectory(mdflib)
 if (wxWidgets_FOUND AND WIN32)
     add_subdirectory(mdfviewer)
 endif()
+
