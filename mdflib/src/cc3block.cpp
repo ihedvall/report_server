@@ -2,6 +2,7 @@
  * Copyright 2021 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
+#include <limits>
 #include "cc3block.h"
 #include "tx3block.h"
 namespace {

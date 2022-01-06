@@ -71,7 +71,7 @@ target_include_directories(mdf PUBLIC
         )
 target_include_directories(mdf PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(mdf PRIVATE ../utillib/include)
-set(UTIL_PUBLIC_HEADERS
+set(MDF_PUBLIC_HEADERS
         include/mdf/iattachment.h
         include/mdf/ichannel.h
         include/mdf/ichannelconversion.h
@@ -83,7 +83,7 @@ set(UTIL_PUBLIC_HEADERS
         include/mdf/mdfreader.h
 )
 
-set_target_properties(mdf PROPERTIES PUBLIC_HEADER "${UTIL_PUBLIC_HEADERS}")
+set_target_properties(mdf PROPERTIES PUBLIC_HEADER "${MDF_PUBLIC_HEADERS}")
 get_target_property(PH1 mdf PUBLIC_HEADER)
 message( STATUS "MDF Target Includes: " "${PH1}")
 

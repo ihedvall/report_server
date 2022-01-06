@@ -86,7 +86,7 @@ class CsvWriter final {
  private:
   std::FILE* file_ = nullptr; ///< Note that the file is opened by the constructor and closed by the destructor
   std::string filename_; ///< Full path filename. Mainly used for error logs.
-  size_t column_count_ = 0; ///< Internal counter that check that correct number of values in each row
+  size_t column_count_ = 0; ///< Internal message_semaphore that check that correct number of values in each row
   size_t max_columns_ = 0; ///< Is set in first row to number of columns in the file
   size_t row_count_ = 0; ///< Keeps track of number of rows.
 

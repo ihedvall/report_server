@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <string>
 
-#if __has_include("source_location")
+#if __has_builtin(__builtin_source_location) //__has_include("source_location")
 #include <source_location>
 #else
 #include <experimental/source_location>
@@ -31,7 +31,7 @@ enum class LogSeverity {
  * The Loc is a wrapper around the std::location library. This library is new in C++20 and some
  * treat is as experimental.
  */
-#if __has_include("source_location")
+#if __has_builtin(__builtin_source_location) //__has_include("source_location")
 
 typedef std::source_location Loc;
 #else

@@ -95,4 +95,11 @@ TEST(StringUtil, FormatDoubleUnit) {
   EXPECT_STREQ(s.c_str(), "11.2000 mV");
 }
 
+TEST(StringUtil, StringSize) {
+  std::string data(2000, '\0');
+  std::string copy(data.c_str());
+  EXPECT_TRUE(copy.empty());
+  EXPECT_EQ(copy.size(), 0);
+}
+
 } //namespace util::test

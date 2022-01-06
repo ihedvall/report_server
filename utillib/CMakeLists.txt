@@ -12,6 +12,7 @@ include("../script/boost.cmake")
 include("../script/zlib.cmake")
 include("../script/openssl.cmake")
 include("../script/expat.cmake")
+include("../script/sqlite3.cmake")
 include("../script/googletest.cmake")
 include("../script/doxygen.cmake")
 
@@ -31,7 +32,7 @@ add_library(util STATIC
         include/util/ilogger.h
         include/util/zlibutil.h src/zlibutil.cpp
         include/util/cryptoutil.h src/cryptoutil.cpp
-        include/util/csvwriter.h src/csvwriter.cpp)
+        include/util/csvwriter.h src/csvwriter.cpp src/messagequeue.cpp src/messagequeue.h src/listenmessage.h src/ilisten.cpp include/util/ilisten.h src/listenserver.cpp src/listenserver.h src/listenproxy.cpp src/listenproxy.h src/listenmessage.cpp include/util/threadsafequeue.h src/listenserverconnection.h src/listenserverconnection.cpp)
 
 target_include_directories(util PUBLIC
         $<INSTALL_INTERFACE:include>

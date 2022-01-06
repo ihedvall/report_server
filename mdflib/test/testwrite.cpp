@@ -1,6 +1,7 @@
-//
-// Created by ihedv on 2021-12-03.
-//
+/*
+ * Copyright 2021 Ingemar Hedvall
+ * SPDX-License-Identifier: MIT
+ */
 #include <string>
 #include <filesystem>
 #include <thread>

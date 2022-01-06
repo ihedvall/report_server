@@ -116,7 +116,7 @@ class LogConfig final {
 /**
  * Sets the base name (stem) of the file name. Don't add any path or extension. Note that the log file backup older
  * log files by adding a number at the end of the base name so avoid using numbers at the end of the base name.
- * Doo't use spaces in file name. Use underscore instead.
+ * Don't use spaces in file name. Use underscore instead.
  * @param [in] base_name Typical the application name is used as base name.
  */
   void BaseName(const std::string &base_name); ///< Sets the base name (stem) of the log file.

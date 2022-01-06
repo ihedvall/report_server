@@ -32,6 +32,7 @@ include("script/googletest.cmake")
 
 add_subdirectory(utillib)
 add_subdirectory(mdflib)
+add_subdirectory(odslib)
 
 if (wxWidgets_FOUND AND WIN32)
     add_subdirectory(mdfviewer)
