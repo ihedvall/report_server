@@ -28,9 +28,9 @@ needs to be downloaded and built.
 - ZLIB Library. Set the 'ZLIB_ROOT' variable to the ZLIB root path.
 - Doxygen's application. Is required if the documentation should be built.
 - Google Test Library. Is required for running and build the unit tests.
-- wxWidgets Library. Is required for the GUI applications to build. Set both 
+- wxWidgets Library. Is required for the GUI applications to build. Set both the 'wxWidgets_ROOT_DIR' and the 'wxWidgets_LIB_DIR' variables.
 - NSIS Installer. Needed to build an installer executable for Windows.
-the 'wxWidgets_ROOT_DIR' and the 'wxWidgets_LIB_DIR' variables.
+
 
 ## License
 
