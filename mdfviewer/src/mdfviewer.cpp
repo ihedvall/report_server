@@ -95,7 +95,7 @@ bool MdfViewer::OnInit() {
   }
 
 
-  auto* app_config = wxConfig::Create();
+  auto* app_config = wxConfig::Get();
   wxPoint start_pos;
   app_config->Read("/MainWin/X",&start_pos.x, wxDefaultPosition.x);
   app_config->Read("/MainWin/Y",&start_pos.y, wxDefaultPosition.x);

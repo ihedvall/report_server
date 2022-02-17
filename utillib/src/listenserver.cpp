@@ -7,6 +7,7 @@
 #include "util/logstream.h"
 #include "listenserver.h"
 #include "listenserverconnection.h"
+#include "listenconfig.h"
 
 using namespace util::log;
 using namespace boost::asio;
@@ -26,12 +27,7 @@ ListenServer::ListenServer(const std::string &share_name)
 }
 
 ListenServer::~ListenServer() {
-  if (!context_.stopped()) {
-    context_.stop();
-  }
-  if (worker_thread_.joinable() ) {
-   worker_thread_.join();
-  }
+  Stop();
 }
 
 void ListenServer::WorkerTask() {
@@ -52,6 +48,14 @@ bool ListenServer::Start() {
   if (share_mem_queue_) {
     share_mem_queue_->SetActive(false);
   }
+
+  ListenPortConfig config;
+  config.port = Port();
+  config.name = Name();
+  config.share_name = ShareName();
+  config.description = Description();
+  AddListenConfig(config);
+
   try {
     const auto address = ip::make_address(HostName());
     ip::tcp::endpoint endpoint(address, Port());
@@ -70,6 +74,8 @@ bool ListenServer::Start() {
 bool ListenServer::Stop() {
   bool stop = false;
   active_ = false;
+  DeleteListenConfig(Port());
+
   if (share_mem_queue_) {
     share_mem_queue_->SetActive(false);
   }

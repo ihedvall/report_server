@@ -14,6 +14,21 @@ void SendLogMessage(const util::log::LogMessage &m) {
 
 }
 namespace util::log {
+
+void LogDebug(const Loc &loc, const char *fmt, ...) {
+  if (fmt == nullptr) {
+    return;
+  }
+  char buffer[5000]{};
+  std::va_list lsArg;
+  va_start(lsArg, fmt);
+  std::vsnprintf(buffer, 5000, fmt, lsArg);
+  va_end(lsArg);
+  buffer[4999] = '\0';
+
+  LogString(loc, LogSeverity::kDebug, buffer);
+}
+
 void LogInfo(const Loc &loc, const char *fmt, ...) {
   if (fmt == nullptr) {
     return;

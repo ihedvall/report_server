@@ -13,7 +13,7 @@ namespace util::test {
  class ListenMock : public util::log::IListen {
  public:
   ListenMock() = default;
-  ~ListenMock() override;
+  ~ListenMock() override = default;
   [[nodiscard]] bool IsActive() const override;
    [[nodiscard]] size_t LogLevel() override;
 

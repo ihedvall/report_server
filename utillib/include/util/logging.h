@@ -25,7 +25,9 @@ enum class LogSeverity {
   kInfo,      ///< Informational message
   kWarning,   ///< Warning message
   kError,     ///< Error message
-  kFatal      ///< Fatal error message
+  kCritical,  ///< Critical message (device error)
+  kAlert,     ///< Alert or alarm message
+  kEmergency  ///< Fatal error message
 };
 /** \typedef Loc
  * The Loc is a wrapper around the std::location library. This library is new in C++20 and some
@@ -38,6 +40,7 @@ typedef std::source_location Loc;
 typedef std::experimental::source_location Loc;
 #endif
 
+void LogDebug(const Loc &loc, const char *fmt, ...); ///< Creates a debug message message
 void LogInfo(const Loc &loc, const char *fmt, ...); ///< Creates an information message
 void LogError(const Loc &loc, const char *fmt, ...); ///< Creates an error message
 void LogString(const Loc &loc, LogSeverity severity,

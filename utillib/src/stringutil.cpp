@@ -5,8 +5,6 @@
 #include <cstring>
 #include <cmath>
 #include <sstream>
-#include <iomanip>
-#include <locale>
 #include <boost/algorithm/string.hpp>
 #include "util/stringutil.h"
 
@@ -15,10 +13,19 @@ namespace util::string {
 bool IEquals(const std::string &s1, const std::string &s2, size_t nChar) {
   return nChar == 0 ? stricmp(s1.c_str(), s2.c_str()) == 0 :
          strnicmp(s1.c_str(), s2.c_str(), nChar) == 0;
-
 }
+
+bool IEquals(const std::wstring &s1, const std::wstring &s2, size_t nChar) {
+  return nChar == 0 ? wcsicmp(s1.c_str(), s2.c_str()) == 0 :
+         wcsnicmp(s1.c_str(), s2.c_str(), nChar) == 0;
+}
+
 bool IgnoreCase::operator()(const std::string &s1, const std::string &s2) const {
-  return stricmp(s1.c_str(), s2.c_str()) < 0;
+  return boost::algorithm::ilexicographical_compare(s1,s2);
+}
+
+bool IgnoreCase::operator()(const std::wstring &s1, const std::wstring &s2) const {
+  return boost::algorithm::ilexicographical_compare(s1,s2);
 }
 
 void Trim(std::string &text) {
@@ -93,5 +100,6 @@ std::string FormatDouble(double value, uint8_t decimals, bool fixed, const std::
   }
   return text;
 }
+
 }
 

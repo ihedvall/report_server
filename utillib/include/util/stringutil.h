@@ -8,7 +8,7 @@
 namespace util::string
 {
   bool IEquals(const std::string &s1, const std::string &s2, size_t nChar = 0);
-
+  bool IEquals(const std::wstring &s1, const std::wstring &s2, size_t nChar = 0);
   /// This class is used when get a sorted list of string to ignoring case characters.\n
   /// Example of declaring a map:
   /// \code
@@ -18,6 +18,7 @@ namespace util::string
   {
   public:
     bool operator()(const std::string &s1, const std::string &s2) const; ///< Compare the strings by ignoring case.
+    bool operator()(const std::wstring &s1, const std::wstring &s2) const; ///< Compare the strings by ignoring case.
   };
 
   void Trim(std::string &text);

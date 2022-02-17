@@ -13,6 +13,7 @@
 #include "util/logging.h"
 
 namespace util::log {
+#define LOG_DEBUG() LogStream(util::log::Loc::current(), util::log::LogSeverity::kDebug) ///< Debug log stream
 #define LOG_INFO() LogStream(util::log::Loc::current(), util::log::LogSeverity::kInfo) ///< Info log stream
 #define LOG_ERROR() LogStream(util::log::Loc::current(), util::log::LogSeverity::kError) ///< Error log stream
 

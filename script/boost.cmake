@@ -8,7 +8,7 @@ if (NOT Boost_FOUND)
     set(Boost_NO_WARN_NEW_VERSIONS ON)
     set(Boost_DEBUG OFF)
 
-    find_package(Boost REQUIRED COMPONENTS filesystem system locale)
+    find_package(Boost REQUIRED COMPONENTS filesystem system locale program_options)
 endif()
 message(STATUS "Boost Found: " ${Boost_FOUND})
 message(STATUS "Boost Version: " ${Boost_VERSION_STRING})

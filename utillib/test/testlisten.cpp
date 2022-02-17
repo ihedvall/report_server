@@ -9,6 +9,7 @@
 #include "util/logconfig.h"
 #include "testlisten.h"
 #include "listenserver.h"
+#include "listenconfig.h"
 
 using namespace util::log;
 using namespace util::log::detail;
@@ -44,10 +45,6 @@ size_t ListenMock::LogLevel() {
   return 0;
 }
 
-
-ListenMock::~ListenMock() {
-}
-
 TEST_F(TestListen, ListenBasic) {
   ListenMock listen;
   listen.PreText("TEST>");
@@ -75,4 +72,32 @@ TEST_F(TestListen, ListenServer) {
   const bool stop = server.Stop();
   EXPECT_TRUE(stop);
 }
+
+TEST_F(TestListen, ListenConfig) {
+  ListenPortConfig devils_port;
+  devils_port.port = 666;
+  devils_port.name = "Devils Gate";
+  devils_port.share_name = "Trump";
+  devils_port.description = "Republican";
+
+  {
+    ListenConfig master;
+
+    auto list_empty = GetListenConfigList();
+    EXPECT_TRUE(list_empty.empty());
+
+    AddListenConfig(devils_port);
+    auto list_one = GetListenConfigList();
+    EXPECT_EQ(list_one.size(), 1);
+
+    DeleteListenConfig(devils_port.port);
+    auto list_none = GetListenConfigList();
+    EXPECT_TRUE(list_none.empty());
+  }
+  {
+    AddListenConfig(devils_port);
+    DeleteListenConfig(devils_port.port);
+  }
 }
+
+} // end namespace

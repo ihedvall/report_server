@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.20)
 project(MdfViewer
-        VERSION 0.1
+        VERSION 1.0
         DESCRIPTION "Simple MDF file browser"
         LANGUAGES CXX)
 
@@ -11,7 +11,11 @@ add_executable(mdfview
         src/mainframe.cpp src/mainframe.h
         src/mdfdocument.cpp src/mdfdocument.h
         src/mdfview.cpp src/mdfview.h
-        src/mdfviewer.rc src/childframe.cpp src/childframe.h src/windowid.h src/channelobserverlistview.cpp src/channelobserverlistview.h src/channelobserverframe.cpp src/channelobserverframe.h)
+        src/mdfviewer.rc
+        src/childframe.cpp src/childframe.h
+        src/windowid.h
+        src/channelobserverlistview.cpp src/channelobserverlistview.h
+        src/channelobserverframe.cpp src/channelobserverframe.h)
 
 
 target_include_directories(mdfview PRIVATE ${wxWidgets_INCLUDE_DIRS})

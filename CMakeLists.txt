@@ -3,11 +3,11 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(ReportServer
-        VERSION 0.1
+        VERSION 0.2
         DESCRIPTION "Application with ODS, MDF and HDF technology dependencies"
         LANGUAGES CXX)
 
-option(BUILD_SHARED_LIBS "Static libraries are prefered" OFF)
+option(BUILD_SHARED_LIBS "Static libraries are preferred" OFF)
 option(BUILD_STATIC_LIBS "Static libraries are normally used" ON)
 option(BUILD_DOC "If doxygen is installed, then build documentation in Release mode" ON)
 
@@ -36,5 +36,10 @@ add_subdirectory(odslib)
 
 if (wxWidgets_FOUND AND WIN32)
     add_subdirectory(mdfviewer)
+    add_subdirectory(serviceexplorer)
 endif()
 
+if (WIN32)
+    add_subdirectory(serviced)
+
+endif()

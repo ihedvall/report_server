@@ -66,6 +66,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
   wxFrameBase::SetMenuBar(menu_bar);
 }
 
+
 void MainFrame::OnClose(wxCloseEvent &event) {
 
   // If the window is minimized. Do not save as last position
@@ -74,7 +75,7 @@ void MainFrame::OnClose(wxCloseEvent &event) {
     bool maximized = IsMaximized();
     wxPoint end_pos = GetPosition();
     wxSize end_size = GetSize();
-    auto* app_config = wxConfig::Create();
+    auto* app_config = wxConfig::Get();
 
     if (maximized) {
       app_config->Write("/MainWin/Max",maximized);
