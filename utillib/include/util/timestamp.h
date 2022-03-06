@@ -154,6 +154,24 @@ uint64_t CanOpenDateArrayToNs(const std::vector<uint8_t> &buffer);
  */
 std::vector<uint8_t> NsToCanOpenTimeArray(uint64_t ns_since_1970);
 
+/** \brief Formats a date string according to the local date format.
+ *
+ * Formats a date string according to the local date format.
+ * @param ns_since_1970 Number of nanoseconds since 1970
+ * @return Localized date string
+ */
+std::string NsToLocalDate(uint64_t ns_since_1970);
+
+/** \brief Formats a time string according to the local time format.
+ *
+ * Formats a time string with optional ms..ns. The output format is according to the
+ * local time format.
+ * @param ns_since_1970 Number of nanoseconds since 1970
+ * @param format 0 = Show only seconds, 1 = Show ms, 2 = Show microseconds, 3 = Show ns
+ * @return Localized time string
+ */
+std::string NsToLocalTime(uint64_t ns_since_1970, int format = 0);
+
 /** \brief Converts from a CANopen 6 byte Time array to nanoseconds since 1970.
  *
  * Converts from nanoseconds since 1970-01-01 to a 6-byte CANopen time array

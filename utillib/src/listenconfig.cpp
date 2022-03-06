@@ -10,7 +10,7 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_recursive_mutex.hpp>
 #include "util/logstream.h"
-#include "listenconfig.h"
+#include "util/listenconfig.h"
 
 using namespace boost::interprocess;
 
@@ -32,7 +32,7 @@ namespace {
   };
 }
 
-namespace util::log::detail {
+namespace util::log {
 
 ListenConfig::ListenConfig() {
 
@@ -85,6 +85,7 @@ std::vector<ListenPortConfig> GetListenConfigList() {
   } catch (const std::exception& error) {
     LOG_INFO() << "Failed to connect to the shared memory. Error: " << error.what();
   }
+  std::sort(list.begin(), list.end());
   return list;
 }
 

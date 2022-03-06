@@ -16,7 +16,9 @@ include("../script/doxygen.cmake")
 add_library(ods STATIC
         include/ods/itable.h src/itable.cpp
         include/ods/idatabase.h
-        include/ods/databaseguard.h src/databaseguard.cpp src/sqlitedatabase.cpp src/sqlitedatabase.h src/sqlitestatement.cpp src/sqlitestatement.h)
+        include/ods/databaseguard.h src/databaseguard.cpp
+        src/sqlitedatabase.cpp src/sqlitedatabase.h
+        src/sqlitestatement.cpp src/sqlitestatement.h)
 
 
 

@@ -32,7 +32,16 @@ add_library(util STATIC
         include/util/ilogger.h
         include/util/zlibutil.h src/zlibutil.cpp
         include/util/cryptoutil.h src/cryptoutil.cpp
-        include/util/csvwriter.h src/csvwriter.cpp src/messagequeue.cpp src/messagequeue.h src/listenmessage.h src/ilisten.cpp include/util/ilisten.h src/listenserver.cpp src/listenserver.h src/listenproxy.cpp src/listenproxy.h src/listenmessage.cpp include/util/threadsafequeue.h src/listenserverconnection.h src/listenserverconnection.cpp src/listenconfig.cpp src/listenconfig.h src/listenclient.cpp src/listenclient.h)
+        include/util/csvwriter.h src/csvwriter.cpp
+        src/messagequeue.cpp src/messagequeue.h
+        src/listenmessage.h src/listenmessage.cpp
+        src/ilisten.cpp include/util/ilisten.h
+        src/listenserver.cpp src/listenserver.h
+        src/listenproxy.cpp src/listenproxy.h
+        include/util/threadsafequeue.h
+        src/listenserverconnection.h src/listenserverconnection.cpp
+        src/listenconfig.cpp include/util/listenconfig.h
+        src/listenclient.cpp src/listenclient.h src/listenlogger.cpp src/listenlogger.h)
 
 target_include_directories(util PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -42,7 +51,7 @@ target_include_directories(util PUBLIC
 target_include_directories(util PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(util PRIVATE ${EXPAT_INCLUDE_DIRS})
 target_include_directories(util PRIVATE ${ZLIB_INCLUDE_DIRS})
-target_include_directories(util PRIVATE ${OPENSSL_INCLUDE_DIR})
+#target_include_directories(util PRIVATE ${OPENSSL_INCLUDE_DIR})
 
 set(UTIL_PUBLIC_HEADERS
     include/util/cryptoutil.h

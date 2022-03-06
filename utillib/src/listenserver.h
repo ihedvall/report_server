@@ -32,9 +32,6 @@ class ListenServer : public IListen {
 
   void InMessage(std::unique_ptr<ListenMessage> msg);
 
-  void SetLogLevelText(uint64_t level, const std::string& menu_text);
-  [[nodiscard]] const std::map<uint64_t,std::string>& LogLevelList() const;
-
   void ShareName(const std::string& share_name);
   [[nodiscard]] std::string ShareName() const;
 
@@ -54,10 +51,9 @@ class ListenServer : public IListen {
   ThreadSafeQueue<ListenMessage> msg_queue_;
   boost::asio::steady_timer queue_timer_;
 
-  std::map<uint64_t,std::string> log_level_list_;
   std::atomic<uint64_t> log_level_ = 0;
   std::atomic<bool> active_ = false;
-  std::string share_name_;
+
   std::unique_ptr<MessageQueue> share_mem_queue_;
 
 

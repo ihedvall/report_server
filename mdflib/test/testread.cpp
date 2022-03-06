@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <filesystem>
+#include <chrono>
 #include "util/logconfig.h"
 #include "util/stringutil.h"
 #include "util/logstream.h"
@@ -17,6 +18,7 @@ using namespace util::string;
 using namespace mdf;
 using namespace mdf::detail;
 using namespace util::log;
+using namespace std::chrono_literals;
 
 namespace {
 const std::string mdf_source_dir = "k:/test/mdf"; // Where all source MDF files exist
@@ -110,6 +112,47 @@ TEST_F(TestRead, IdBlock) //NOLINT
   EXPECT_STREQ(id.VersionString().c_str(), "4.10");
   EXPECT_STREQ(id.ProgramId().c_str(), "MCD11.01");
   EXPECT_EQ(id.Version(), 410);
+
+}
+
+TEST_F(TestRead, Benchmark) {
+  {
+    MdfReader oRead("K:/test/mdf/net/testfiles/test.mf4");
+    const auto start = std::chrono::steady_clock::now();
+    oRead.ReadMeasurementInfo();
+    const auto stop = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = stop - start;
+    std::cout << "Read Measurement Info TrueNas: " << diff.count() * 1000 << " ms" << std::endl;
+  }
+  {
+    const auto start = std::chrono::steady_clock::now();
+    MdfReader oRead("K:/test/mdf/net/testfiles/test.mf4");
+    oRead.ReadEverythingButData();
+    const auto* file = oRead.GetFile();
+    DataGroupList dg_list;
+    file->DataGroups(dg_list);
+    for ( auto* dg : dg_list) {
+      ChannelObserverList observer_list;
+      auto cg_list = dg->ChannelGroups();
+      for (const auto* cg : cg_list) {
+        CreateChannelObserverForChannelGroup(*dg, *cg, observer_list);
+      }
+      oRead.ReadData(*dg);
+
+      double eng_value = 0;
+      bool valid = true;
+      for (const auto& channel : observer_list) {
+        size_t samples = channel->NofSamples();
+        for (size_t sample = 0; sample < samples; ++sample) {
+          valid = channel->GetEngValue(sample,eng_value);
+        }
+      }
+    }
+
+    const auto stop = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = stop - start;
+    std::cout << "Everything + Conversion (TrueNas): " << diff.count() * 1000 << " ms" << std::endl;
+  }
 
 }
 

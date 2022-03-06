@@ -22,8 +22,15 @@ namespace util::log {
 enum class LogType {
   LogNothing = 0, ///< No logger.
   LogToConsole,   ///< Log to the cout stream.
-  LogToFile       ///< Log to file.
+  LogToFile,      ///< Log to file.
+  LogToListen     ///< Log to listen window (system messages)
 };
+
+/**
+ * Utility function that returns the default program data path
+ * @return Typical 'c:/programdata' in Windows.
+ */
+std::string ProgramDataPath();
 
 /** \class LogConfig logconfig.h "util/logconfig.h
  * \brief Singleton class that is used for configure the default logger in an application.
@@ -75,13 +82,20 @@ class LogConfig final {
   void DeleteLogChain(); ///< Clear the list of loggers.
 
 /**
- * Adds a new logger to the logger list. The logger should use a unique name and any existing
+ * Adds a known logger to the logger list. The logger should use a unique name and any existing
  * logger with the same name, will be removed. Note that logger names is case insensitive.
  * @param [in] logger_name Unique name of the logger.
  * @param [in] logger Smart pointer to the new logger.
  */
   void AddLogger(const std::string &logger_name,
                  std::unique_ptr<ILogger> logger); ///< Adds a logger with a unique name.
+/**
+ * Adds a new logger to the logger list. The logger should use a unique name and any existing
+ * logger with the same name, will be removed. Note that logger names is case insensitive.
+ * @param [in] logger_name Unique name of the logger.
+ * @param [in] type Type of logger.
+ */
+  void AddLogger(const std::string &logger_name,const LogType type); ///< Adds a predefined logger with a unique name.
 
   /**
   * Deletes a logger by its name.

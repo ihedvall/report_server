@@ -9,7 +9,7 @@
 #include "util/logconfig.h"
 #include "testlisten.h"
 #include "listenserver.h"
-#include "listenconfig.h"
+#include "util/listenconfig.h"
 
 using namespace util::log;
 using namespace util::log::detail;
@@ -67,7 +67,7 @@ TEST_F(TestListen, ListenServer) {
   const bool start = server.Start();
   EXPECT_TRUE(start);
 
-  std::this_thread::sleep_for(60s);
+  std::this_thread::sleep_for(5s);
 
   const bool stop = server.Stop();
   EXPECT_TRUE(stop);

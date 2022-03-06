@@ -101,5 +101,59 @@ std::string FormatDouble(double value, uint8_t decimals, bool fixed, const std::
   return text;
 }
 
+bool WildcardMatch(const std::string& text, const std::string& wildcard, bool ignore_case ) {
+    // Fast return in normal filter cases
+  if (wildcard.empty() || wildcard == "*s") {
+    return true;
+  }
+
+  const char* star = strchr( wildcard.c_str(), '*' );
+  const char* amper = strchr( wildcard.c_str(), '?' );
+  if (star == nullptr && amper == nullptr) {
+    return ignore_case ? IEquals(text, wildcard, wildcard.size()) :
+            strncmp( text.c_str(), wildcard.c_str(), wildcard.size()) == 0;
+  }
+  const auto* text_ptr = text.c_str();
+  const auto* wild_ptr = wildcard.c_str();
+  while (*text_ptr != '\0' && *wild_ptr != '*' ) {
+    if (ignore_case) {
+      if ( tolower(*wild_ptr) != tolower(*text_ptr) && *wild_ptr != '?') {
+        return false;
+      }
+    } else {
+      if (*wild_ptr != *text_ptr && *wild_ptr != '?') {
+        return false;
+      }
+    }
+   ++wild_ptr;
+   ++text_ptr;
+  }
+  const char* text_temp = nullptr;
+  const char* wild_temp = nullptr;
+
+  while ( *text_ptr != '\0' ) {
+    if ( *wild_ptr == '*' ) {
+      if ( !*++wild_ptr ) {
+        return true;
+      }
+      wild_temp = wild_ptr;
+      text_temp = text_ptr + 1;
+    } else if (ignore_case && (tolower(*wild_ptr) == tolower(*text_ptr) || *wild_ptr == '?' ) ) {
+      ++wild_ptr;
+      ++text_ptr;
+    } else if (!ignore_case && (*wild_ptr == *text_ptr || *wild_ptr == '?' ) ){
+      ++wild_ptr;
+      ++text_ptr;
+    } else {
+      wild_ptr = wild_temp;
+      text_ptr = text_temp++;
+    }
+  }
+
+  while ( *wild_ptr == '*' ) {
+    ++wild_ptr;
+  }
+  return *wild_ptr == '\0';
+}
 }
 

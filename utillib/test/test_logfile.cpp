@@ -33,7 +33,7 @@ TEST(LogFile, OpenCloseWithExtension)// NOLINT
     // Test normal usage
     auto &log_config = LogConfig::Instance();
     log_config.BaseName("olle.log");
-    log_config.SubDir("Testing");
+    log_config.SubDir("Testing/log");
     log_config.Type(LogType::LogToFile);
     log_config.CreateDefaultLogger();
 
@@ -55,7 +55,7 @@ TEST(LogFile, OpenCloseWithoutExtension)// NOLINT
     // Test normal usage
     auto &log_config = LogConfig::Instance();
     log_config.BaseName("pelle.log");
-    log_config.SubDir("Testing");
+    log_config.SubDir("Testing/log");
     log_config.Type(LogType::LogToFile);
     log_config.CreateDefaultLogger();
 
@@ -79,7 +79,7 @@ TEST(LogFile, OpenCloseFullPath)// NOLINT
     path curr = current_path();
     curr.replace_filename("test.log");
     log_config.BaseName(curr.string());
-    log_config.SubDir("Testing");
+    log_config.SubDir("Testing/log");
     log_config.Type(LogType::LogToFile);
     log_config.CreateDefaultLogger();
 

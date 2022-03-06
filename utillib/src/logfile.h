@@ -27,6 +27,7 @@ namespace util::log::detail {
 class LogFile final : public ILogger {
  public:
   LogFile() noexcept; ///< Constructor
+  explicit LogFile(const std::string& base_name);
   ~LogFile() override;///< Destructor
 
   LogFile(const LogFile &) = delete;
@@ -52,7 +53,7 @@ class LogFile final : public ILogger {
   std::atomic<bool> stop_thread_ = false;
   std::condition_variable condition_;
 
-  void InitLogFile();
+  void InitLogFile(const std::string& base_name);
   void StartWorkerThread();
   void WorkerThread();
   void HandleMessage(const LogMessage &m);

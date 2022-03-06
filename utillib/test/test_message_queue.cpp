@@ -21,7 +21,7 @@ std::atomic<bool> kStopTask = false;
 
 void SendTask() {
   MessageQueue queue(false, kQueueName.data());
-  for (size_t index = 0; index < 100; ++index) {
+  for (size_t index = 0; index < 10; ++index) {
       SharedListenMessage msg;
       msg.ns1970 = index;
       strcpy(msg.text, "Text");
@@ -60,7 +60,7 @@ TEST(MessageQueue, TestBasic) {
 
   auto send_task = std::thread(&SendTask);
   send_task.join();
-  EXPECT_EQ(master.NofMessages(), 100);
+  EXPECT_EQ(master.NofMessages(), 10);
 }
 
 TEST(MessageQueue, TestMultipleSender) {
@@ -69,14 +69,14 @@ TEST(MessageQueue, TestMultipleSender) {
   kStopTask = false;
   auto server_task = std::thread(&ReceiveTask, &master);
 
-  std::array<std::thread, 100> task_list;
+  std::array<std::thread, 10> task_list;
   for (auto& task1 : task_list) {
     task1 = std::thread(&SendTask);
   }
   for (auto& task2 : task_list) {
     task2.join();
   }
-  for (size_t count = 0; count < 1000 && kTaskCount < task_list.size() * 100; ++count) {
+  for (size_t count = 0; count < 1000 && kTaskCount < task_list.size() * 10; ++count) {
     std::this_thread::sleep_for(10ms);
   }
 
@@ -85,6 +85,6 @@ TEST(MessageQueue, TestMultipleSender) {
   server_task.join();
 
   std::cout << "Message Count: " << kTaskCount << std::endl;
-  EXPECT_EQ(kTaskCount,task_list.size() * 100);
+  EXPECT_EQ(kTaskCount,task_list.size() * 10);
 }
 } // end namespace util::test

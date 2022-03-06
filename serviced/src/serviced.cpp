@@ -35,7 +35,7 @@ int main(int nof_arg, char *arg_list[]) {
   // Set log file name to the service name
   auto& log_config = LogConfig::Instance();
   log_config.Type(LogType::LogToFile);
-  log_config.SubDir("report_server");
+  log_config.SubDir("report_server/log");
   log_config.BaseName(service.Name().empty() ? "serviced" : service.Name());
   log_config.CreateDefaultLogger();
   LOG_DEBUG() << "Log File created. Path: " << log_config.GetLogFile();

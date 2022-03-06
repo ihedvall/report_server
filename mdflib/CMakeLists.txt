@@ -57,13 +57,17 @@ add_library(mdf STATIC
         src/blockproperty.cpp src/blockproperty.h
         src/mdf4timestamp.cpp src/mdf4timestamp.h
         include/mdf/iattachment.h src/iattachment.cpp
-        include/mdf/ichannel.h
+        include/mdf/ichannel.h src/ichannel.cpp
         include/mdf/idatagroup.h src/idatagroup.cpp
-        include/mdf/ichannelgroup.h
+        include/mdf/ichannelgroup.h src/ichannelgroup.cpp
         include/mdf/isampleobserver.h
         src/channelobserver.h src/channelobserver.cpp
-        include/mdf/ichannelobserver.h
-        include/mdf/ichannelconversion.h src/ichannelobserver.cpp include/mdf/mdf3writer.h src/ichannelconversion.cpp src/ichannel.cpp src/dt3block.cpp src/dt3block.h include/mdf/iheader.h src/mdf3writer.cpp include/mdf/samplerecord.h src/ichannelgroup.cpp)
+        include/mdf/ichannelobserver.h src/ichannelobserver.cpp
+        include/mdf/ichannelconversion.h src/ichannelconversion.cpp
+        include/mdf/mdf3writer.h src/mdf3writer.cpp
+        src/dt3block.cpp src/dt3block.h
+        include/mdf/iheader.h
+        include/mdf/samplerecord.h )
 
 target_include_directories(mdf PUBLIC
         $<INSTALL_INTERFACE:include>

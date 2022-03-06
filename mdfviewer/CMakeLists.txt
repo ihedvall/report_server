@@ -6,7 +6,7 @@ project(MdfViewer
         DESCRIPTION "Simple MDF file browser"
         LANGUAGES CXX)
 
-add_executable(mdfview
+add_executable(mdfview 
         src/mdfviewer.cpp src/mdfviewer.h
         src/mainframe.cpp src/mainframe.h
         src/mdfdocument.cpp src/mdfdocument.h
@@ -23,7 +23,7 @@ target_include_directories(mdfview PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(mdfview PRIVATE "../../mdflib/include")
 target_include_directories(mdfview PRIVATE "../../utillib/include")
 
-target_link_options(mdfview PRIVATE -mwindows)
+target_link_options(mdfview PRIVATE -mwindows -static )
 
 target_link_libraries(mdfview PRIVATE mdf)
 target_link_libraries(mdfview PRIVATE util)
@@ -31,9 +31,11 @@ target_link_libraries(mdfview PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(mdfview PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(mdfview PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(mdfview PRIVATE ${ZLIB_LIBRARIES})
-target_link_libraries(mdfview PRIVATE ${OPENSSL_CRYPTO_LIBRARIES})
-target_link_libraries(mdfview PRIVATE libiconv ${Iconv_LIBRARIES})
-target_link_libraries(mdfview PRIVATE bcrypt.lib)
+target_link_libraries(mdfview PRIVATE crypto ) #${OPENSSL_CRYPTO_LIBRARIES})
+target_link_libraries(mdfview PRIVATE iconv )
+target_link_libraries(mdfview PRIVATE bcrypt)
+target_link_libraries(mdfview PRIVATE ws2_32)
+#target_link_libraries(mdfview PRIVATE wsock32)
 
 if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") )
     set(DOXYGEN_RECURSIVE YES)

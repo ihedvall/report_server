@@ -13,15 +13,17 @@ add_executable(serviced src/serviced.cpp src/servicehelper.cpp src/servicehelper
 target_include_directories(serviced PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(serviced PRIVATE "../../utillib/include")
 
-#target_link_options(serviced PRIVATE -mwindows)
+target_link_options(serviced PRIVATE -static)
 
 target_link_libraries(serviced PRIVATE util)
 target_link_libraries(serviced PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(serviced PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(serviced PRIVATE ${ZLIB_LIBRARIES})
-target_link_libraries(serviced PRIVATE ${OPENSSL_CRYPTO_LIBRARIES})
-target_link_libraries(serviced PRIVATE libiconv ${Iconv_LIBRARIES})
-target_link_libraries(serviced PRIVATE bcrypt.lib)
+target_link_libraries(serviced PRIVATE crypto)
+target_link_libraries(serviced PRIVATE iconv)
+target_link_libraries(serviced PRIVATE bcrypt)
+target_link_libraries(serviced PRIVATE ws2_32)
+target_link_libraries(serviced PRIVATE mswsock)
 
 if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") )
     set(DOXYGEN_RECURSIVE YES)

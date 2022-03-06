@@ -7,7 +7,7 @@
 #include "util/logstream.h"
 #include "listenserver.h"
 #include "listenserverconnection.h"
-#include "listenconfig.h"
+#include "util/listenconfig.h"
 
 using namespace util::log;
 using namespace boost::asio;
@@ -187,13 +187,7 @@ void ListenServer::InMessage(std::unique_ptr<ListenMessage> msg) {
   msg_queue_.Put(msg);
 }
 
-void ListenServer::SetLogLevelText(size_t level, const std::string &menu_text) {
-  log_level_list_.insert({level, menu_text});
-}
 
-const std::map<uint64_t, std::string> &ListenServer::LogLevelList() const {
-  return log_level_list_;
-}
 
 size_t ListenServer::LogLevel() {
   return log_level_;

@@ -305,7 +305,6 @@ bool MdfReader::ReadMeasurementInfo() {
   return no_error;
 }
 
-
 bool MdfReader::ReadEverythingButData() {
   if (!instance_) {
     LOG_ERROR() << "No instance created. File: " << filename_;

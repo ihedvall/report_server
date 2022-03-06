@@ -19,7 +19,6 @@ class ListenProxy : public IListen {
   [[nodiscard]] bool IsActive() const override;
   [[nodiscard]] size_t LogLevel() override;
 
- protected:
   void AddMessage(uint64_t nano_sec_1970, const std::string &pre_text, const std::string &text) override;
  private:
   MessageQueue queue_;

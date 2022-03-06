@@ -32,8 +32,8 @@ class LogConsole final : public ILogger {
   LogConsole &operator=(const LogConsole &&) = delete;
 
   void AddLogMessage(const LogMessage &message) override; ///< Mandatory message interface
-  bool HasLogFile() const override; ///< Returns true if it have a log file.
-  std::string Filename() const override; ///< Returns the log file
+  [[nodiscard]] bool HasLogFile() const override; ///< Returns true if it have a log file.
+  [[nodiscard]] std::string Filename() const override; ///< Returns the log file
   void Stop() override; ///< Stops any working thread.
 
  private:

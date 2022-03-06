@@ -7,8 +7,10 @@
 #include <string>
 #include <memory>
 #include <vector>
-
+#include <map>
 namespace util::log {
+
+
 
 class IListen {
  public:
@@ -29,6 +31,9 @@ class IListen {
   [[nodiscard]] uint16_t Port() const;
   void Port(uint16_t port);
 
+  void SetLogLevelText(uint64_t level, const std::string& menu_text);
+  [[nodiscard]] const std::map<uint64_t,std::string>& LogLevelList() const;
+
   virtual void ListenText(const char* format_text, ... );
   virtual void ListenTextEx(uint64_t ns1970, const std::string& pre_text, const char* format_text, ... );
 
@@ -40,21 +45,27 @@ class IListen {
 
   virtual bool Start();
   virtual bool Stop();
-  virtual std::unique_ptr<IListen> Create(const std::string& type, const std::string& share_name);
+
  protected:
-  IListen() = default;
-
-  virtual void AddMessage(uint64_t nano_sec_1970, const std::string& pre_text, const std::string& text) = 0;
-  static std::string ParseHex(const std::vector<uint8_t>& buffer);
-
- private:
+  std::string share_name_; ///< Share memory name
   std::string name_;  ///< Display name.
   std::string description_; ///< Description of the functionality.
   std::string pre_text_; ///< Small text between time and text string.
   std::string host_name_ = "127.0.0.1"; ///< Host name
   uint16_t port_ = 0; ///< IP-port to listen on.
+  std::map<uint64_t,std::string> log_level_list_; // Log level index and
+
+  IListen() = default;
+
+  virtual void AddMessage(uint64_t nano_sec_1970, const std::string& pre_text, const std::string& text) = 0;
+  static std::string ParseHex(const std::vector<uint8_t>& buffer);
+
+
+ private:
 
 };
+
+std::unique_ptr<IListen> CreateListen(const std::string& type, const std::string& share_name);
 
 }
 

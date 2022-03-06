@@ -13,7 +13,7 @@
 #include "listenproxy.h"
 namespace util::log {
 
-std::unique_ptr<IListen> IListen::Create(const std::string &type, const std::string &share_name) {
+std::unique_ptr<IListen> CreateListen(const std::string &type, const std::string &share_name) {
   std::unique_ptr<IListen> listen;
   if (util::string::IEquals(type, "ListenProxy") && !share_name.empty()) {
     listen = std::make_unique<detail::ListenProxy>(share_name);
@@ -72,6 +72,14 @@ uint16_t IListen::Port() const {
 
 void IListen::Port(uint16_t port) {
   port_ = port;
+}
+
+void IListen::SetLogLevelText(size_t level, const std::string &menu_text) {
+  log_level_list_.insert({level, menu_text});
+}
+
+const std::map<uint64_t, std::string> &IListen::LogLevelList() const {
+  return log_level_list_;
 }
 
 void IListen::ListenText(const char* format_text, ...) {

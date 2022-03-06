@@ -6,7 +6,6 @@
 #include <iostream>
 #include <exception>
 #include <chrono>
-
 #include "logfile.h"
 #include "util/logconfig.h"
 #include "util/timestamp.h"
@@ -26,11 +25,17 @@ std::string GetStem(const std::string &file) {
   return file;
 }
 
-std::string FindLogPath() {
+/**
+ * Returns the preferred program data root dir. In windows this is 'c:\programdata'.
+ * @return empty string or the preferred application data directory.
+ */
+
+
+std::string FindLogPath(const std::string& base_name) {
   try {
     auto &log_config = util::log::LogConfig::Instance();
 
-    path filename(log_config.BaseName());
+    path filename(base_name.empty() ? log_config.BaseName() : base_name);
 
     // Add an extension if it is missing
     if (!filename.has_extension()) {
@@ -41,7 +46,13 @@ std::string FindLogPath() {
     if (filename.has_root_path()) {
       return filename.string();
     }
+
     path root_dir(log_config.RootDir());
+    // Try program data path
+    if (root_dir.empty()) {
+      root_dir = util::log::ProgramDataPath();
+    }
+    // Still empty. Use temp path
     if (root_dir.empty()) {
       root_dir = temp_directory_path();
     }
@@ -101,7 +112,11 @@ std::string LogFile::Filename() const {
 }
 
 LogFile::LogFile() noexcept {
-  InitLogFile();
+  InitLogFile("");
+}
+
+LogFile::LogFile(const std::string &base_name) {
+  InitLogFile(base_name);
 }
 
 LogFile::~LogFile() {
@@ -130,30 +145,39 @@ void LogFile::WorkerThread() {
 
   do {
     std::unique_lock<std::mutex> lock(locker_);
-    condition_.wait_for(lock, file_ == nullptr ? 1000ms : 10000ms,
-                        [&] {return stop_thread_.load();});
+    condition_.wait_for(lock, 1000ms, [&] {
+      return stop_thread_.load();
+    });
 
     int message_count = 0;
-    for (; !message_list_.empty() && message_count <= 1000; ++message_count) {
+    for (; !message_list_.empty() && message_count <= 10000; ++message_count) {
       LogMessage m = message_list_.front();
       message_list_.pop();
       lock.unlock();
       HandleMessage(m);
       lock.lock();
     }
-    if ((message_count == 0 || message_count >= 1000) && file_ != nullptr) {
+    if (file_ != nullptr) {
       std::fclose(file_);
       file_ = nullptr;
     }
     try {
-      path p(filename_);
-      if (file_ == nullptr && exists(p) && file_size(p) > 10'000'000) {
-        BackupFiles(filename_);
+      if (message_count > 0) {
+        path p(filename_);
+        if (file_ == nullptr && exists(p) && file_size(p) > 10'000'000) {
+          BackupFiles(filename_);
+        }
       }
     } catch (const std::exception &error) {
       util::log::LOG_ERROR() << "Failed to backup log files. Error: " << error.what();
     }
   } while (!stop_thread_);
+
+  while(!message_list_.empty()) {
+    LogMessage m = message_list_.front();
+    message_list_.pop();
+    HandleMessage(m);
+  }
 
   if (file_ != nullptr) {
     std::fclose(file_);
@@ -178,15 +202,18 @@ void LogFile::HandleMessage(const LogMessage &m) {
 
   std::ostringstream temp;
   temp << "[" << time << "] "
-       << severity << " "
-       << "[" << GetStem(m.location.file_name()) << ":"
-       << m.location.function_name()
-       << ":" << m.location.line() << "] "
-       << m.message;
-
-  if (!has_newline) {
-    temp << std::endl;
+       << severity << " ";
+  if (has_newline) {
+    std::string text = m.message;
+    text.pop_back();
+    temp << text << " ";
+  } else {
+    temp << m.message << " ";
   }
+  temp << "[" << GetStem(m.location.file_name()) << ":"
+       << m.location.function_name()
+       << ":" << m.location.line() << "]"
+       << std::endl;
   std::fwrite(temp.str().data(), 1, temp.str().size(), file_);
 }
 
@@ -223,7 +250,7 @@ void LogFile::Stop() {
   }
 }
 
-void LogFile::InitLogFile() {
+void LogFile::InitLogFile(const std::string& base_name) {
   try {
     stop_thread_ = true;
     if (worker_thread_.joinable()) {
@@ -236,7 +263,7 @@ void LogFile::InitLogFile() {
       file_ = nullptr;
     }
     filename_ = {};
-    path p = FindLogPath();
+    path p = FindLogPath(base_name);
     if (p.empty()) {
       throw std::ios_base::failure(std::string("Path is empty. Path: ") + p.string());
     }
@@ -254,5 +281,6 @@ void LogFile::InitLogFile() {
 bool LogFile::HasLogFile() const {
   return !filename_.empty();
 }
+
 
 }

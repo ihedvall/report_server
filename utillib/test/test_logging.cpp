@@ -75,7 +75,7 @@ TEST(Logging, LogToFile) //NOLINT
   auto &log_config = LogConfig::Instance();
   log_config.Type(LogType::LogToFile);
   log_config.BaseName("test.log");
-  log_config.SubDir("Testing");
+  log_config.SubDir("Testing/log");
   log_config.CreateDefaultLogger();
   for (int ii = 0; ii < 10; ++ii)
     TestLogInfo(ii);
@@ -88,7 +88,7 @@ TEST(Logging, LogToFileMutiThread) //NOLINT
   auto &log_config = LogConfig::Instance();
   log_config.Type(LogType::LogToFile);
   log_config.BaseName("test.log");
-  log_config.SubDir("Testing");
+  log_config.SubDir("Testing/log");
   log_config.CreateDefaultLogger();
   std::array<std::thread, 100> thread_list;
   for (auto &t: thread_list) {
@@ -106,7 +106,7 @@ TEST(Logging, DISABLED_LogToFilePerformance) //NOLINT
   auto &log_config = LogConfig::Instance();
   log_config.Type(LogType::LogToFile);
   log_config.BaseName("test.log");
-  log_config.SubDir("Testing");
+  log_config.SubDir("Testing/log");
   log_config.CreateDefaultLogger();
 
   TestThreadFunction(); // Reuse of the threading function
@@ -119,7 +119,7 @@ TEST(Logging, DISABLED_LogToFileBackup) //NOLINT
   auto &log_config = LogConfig::Instance();
   log_config.Type(LogType::LogToFile);
   log_config.BaseName("test.log");
-  log_config.SubDir("Testing");
+  log_config.SubDir("Testing/log");
   log_config.CreateDefaultLogger();
   for (int ii = 0; ii < 1000'000; ++ii)
     TestLogInfo(ii);

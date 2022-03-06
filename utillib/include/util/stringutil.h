@@ -36,4 +36,13 @@ namespace util::string
   std::string FormatDouble(double value, uint8_t decimals, bool fixed = false,
                            const std::string &unit = {}); ///< Converts a float to a string.
 
+/**
+ * Compare a string against a simple * or ? wildcard string
+ * @param text The text to match
+ * @param wildcard The wildcard string
+ * @param ignore_case True if the algorithm should ignore case
+ * @return Returns True if the text string match the wildcard pattern
+ */
+bool WildcardMatch(const std::string& text, const std::string& wildcard, bool ignore_case );
+
 } //namespace util::string

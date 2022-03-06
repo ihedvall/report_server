@@ -4,12 +4,39 @@
  */
 #include <string>
 #include <mutex>
+#include <locale>
+#include <codecvt>
+#ifdef WIN32
+#include <shlobj.h>
+#pragma comment(lib,"shell32")
+#endif
+
 #include "util/logconfig.h"
 #include "logfile.h"
 #include "logconsole.h"
+#include "logfile.h"
+#include "listenlogger.h"
 
 namespace util::log {
 
+std::string ProgramDataPath() {
+  std::string app_data_path;
+#ifdef WIN32
+  KNOWNFOLDERID folder_id = {};
+  WCHAR* path = nullptr;
+  const auto ret = ::SHGetKnownFolderPath(FOLDERID_ProgramData, 0, nullptr, &path);
+  if (ret == S_OK) {
+    const std::wstring temp(path);
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    app_data_path = conv.to_bytes(temp);
+  }
+  if (path != nullptr) {
+    CoTaskMemFree(path);
+  }
+#endif
+
+  return app_data_path;
+}
 LogConfig &LogConfig::Instance() {
   static LogConfig log_config;
   return log_config;
@@ -100,6 +127,26 @@ void LogConfig::AddLogMessage(const LogMessage &message) const {
   }
 }
 
+void LogConfig::AddLogger(const std::string &logger_name, const LogType type) {
+  std::unique_ptr<ILogger> logger;
+  switch (type) {
+    case LogType::LogToConsole:
+      logger = std::make_unique<util::log::detail::LogConsole>();
+      break;
+
+    case LogType::LogToFile:
+      logger = std::make_unique<util::log::detail::LogFile>(logger_name);
+      break;
+
+    case LogType::LogToListen:
+      logger = std::make_unique<util::log::detail::ListenLogger>();
+      break;
+
+    default:
+      return;
+  }
+  AddLogger(logger_name,std::move(logger));
+}
 
 void LogConfig::AddLogger(const std::string &logger_name, std::unique_ptr<ILogger> logger) {
   std::lock_guard<std::mutex> lock(locker_);
@@ -153,5 +200,6 @@ void LogConfig::Enabled(bool enabled) {
 bool LogConfig::Enabled() const {
   return enabled_;
 }
+
 }
 

@@ -19,7 +19,7 @@ namespace util::log::detail {
 struct SharedListenMessage {
   uint64_t ns1970 = time::TimeStampToNs();
   char pre_text[10] {};
-  char text[100] {};
+  char text[300] {};
 };
 
 struct SharedListenQueue {
@@ -44,6 +44,9 @@ enum class ListenMessageType : uint16_t {
 
 class ListenMessage {
  public:
+  ListenMessage() = default;
+  virtual ~ListenMessage() = default;
+
   ListenMessageType type_ = ListenMessageType::LogLevel;
   uint16_t          version_ = 0;
   uint32_t          body_size_ = 0;
@@ -66,6 +69,7 @@ class LogLevelMessage : public ListenMessage {
   void ToBuffer(std::vector<uint8_t> &dest) override;
   void FromBodyBuffer(const std::vector<uint8_t> &source);
 };
+
 class ListenTextMessage : public ListenMessage {
  public:
   uint64_t ns1970_ = 0;

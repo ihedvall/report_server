@@ -34,12 +34,20 @@ add_subdirectory(utillib)
 add_subdirectory(mdflib)
 add_subdirectory(odslib)
 
+add_subdirectory(listend)
+
+if (WIN32)
+add_subdirectory(serviced)
+endif()
+
+if (wxWidgets_FOUND )
+add_subdirectory(mdfviewer)
+add_subdirectory(listenviewer)
+endif()
+
 if (wxWidgets_FOUND AND WIN32)
-    add_subdirectory(mdfviewer)
     add_subdirectory(serviceexplorer)
 endif()
 
-if (WIN32)
-    add_subdirectory(serviced)
 
-endif()
+
