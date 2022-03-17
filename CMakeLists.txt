@@ -43,6 +43,7 @@ endif()
 if (wxWidgets_FOUND )
 add_subdirectory(mdfviewer)
 add_subdirectory(listenviewer)
+add_subdirectory(odsconfigurator)
 endif()
 
 if (wxWidgets_FOUND AND WIN32)

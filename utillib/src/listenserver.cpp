@@ -213,14 +213,16 @@ void ListenServer::HandleMessage(const ListenMessage* msg) {
   switch (msg->type_) {
     case ListenMessageType::LogLevel: {
       // Set new log level and send out to clients
-      const auto* log_level = dynamic_cast<const LogLevelMessage*>(msg);
-      if (log_level != nullptr) {
-        log_level_ = log_level->log_level_;
+      const auto* log_level_msg = dynamic_cast<const LogLevelMessage*>(msg);
+      if (log_level_msg != nullptr) {
+        log_level_ = log_level_msg->log_level_;
         if (share_mem_queue_) {
+          LOG_ERROR() << "Setting Log level: " << log_level_;
           share_mem_queue_->SetLogLevel(log_level_);
-        }        std::lock_guard lock(connection_list_lock_);
+        }
+        std::lock_guard lock(connection_list_lock_);
         for (auto& connection : connection_list_) {
-          auto send_msg = std::make_unique<LogLevelMessage>(*log_level);
+          auto send_msg = std::make_unique<LogLevelMessage>(*log_level_msg);
           connection->InMessage(std::move(send_msg));
         }
       }

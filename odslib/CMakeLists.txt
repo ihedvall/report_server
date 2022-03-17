@@ -18,7 +18,7 @@ add_library(ods STATIC
         include/ods/idatabase.h
         include/ods/databaseguard.h src/databaseguard.cpp
         src/sqlitedatabase.cpp src/sqlitedatabase.h
-        src/sqlitestatement.cpp src/sqlitestatement.h)
+        src/sqlitestatement.cpp src/sqlitestatement.h include/ods/odsdef.h src/imodel.cpp include/ods/imodel.h src/icolumn.cpp include/ods/icolumn.h src/irelation.cpp include/ods/irelation.h src/ienum.cpp include/ods/ienum.h src/odsdef.cpp src/idatabase.cpp)
 
 
 

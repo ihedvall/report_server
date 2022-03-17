@@ -4,6 +4,7 @@
  */
 #include "listenlogger.h"
 #include "util/timestamp.h"
+#include "util/logstream.h"
 namespace util::log::detail {
 
 ListenLogger::ListenLogger() :
@@ -35,7 +36,7 @@ bool ListenLogger::HasLogFile() const {
 }
 
 std::string ListenLogger::Filename() const {
-  return std::string();
+  return {};
 }
 
 }

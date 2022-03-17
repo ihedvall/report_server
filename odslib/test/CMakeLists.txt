@@ -7,7 +7,7 @@ project(TestOds
         LANGUAGES CXX)
 
 add_executable(test_ods
-        testsqlite.h testsqlite.cpp)
+        testsqlite.h testsqlite.cpp testidatabase.cpp testodsdef.cpp)
 
 target_include_directories(test_ods PRIVATE
         ../include
@@ -20,10 +20,11 @@ target_link_options(test_ods PRIVATE -static )
 target_link_libraries(test_ods PRIVATE ods)
 target_link_libraries(test_ods PRIVATE util)
 target_link_libraries(test_ods PRIVATE ${SQLite3_LIBRARIES})
-target_link_libraries(test_ods PRIVATE ws2_32)
-target_link_libraries(test_ods PRIVATE mswsock)
+target_link_libraries(test_ods PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(test_ods PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(test_ods PRIVATE ${ZLIB_LIBRARIES})
+target_link_libraries(test_ods PRIVATE ws2_32)
+target_link_libraries(test_ods PRIVATE mswsock)
 target_link_libraries(test_ods PRIVATE crypto)
 target_link_libraries(test_ods PRIVATE ${GTEST_BOTH_LIBRARIES})
 

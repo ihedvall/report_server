@@ -45,6 +45,8 @@ void LogInfo(const Loc &loc, const char *fmt, ...); ///< Creates an information 
 void LogError(const Loc &loc, const char *fmt, ...); ///< Creates an error message
 void LogString(const Loc &loc, LogSeverity severity,
                const std::string &message); ///< Creates a generic message
+
+std::string FindNotepad();
 }
 
 

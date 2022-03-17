@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 #include <sstream>
+#include <wx/sizer.h>
 #include "childframe.h"
 #include "mdfdocument.h"
 #include "../../mdflib/src/hl4block.h"
@@ -108,10 +109,12 @@ ChildFrame::ChildFrame(wxDocument *doc,
                      const wxString& title)
     : wxDocMDIChildFrame(doc, view, parent, id, title, wxDefaultPosition, wxDefaultSize,
                          wxDEFAULT_FRAME_STYLE, wxASCII_STR(wxFrameNameStr)),
-                         image_list_(16,16,true,25) {
+                         image_list_(16,16,false,25) {
   SetIcon(wxIcon("SUB_ICON", wxBITMAP_TYPE_ICO_RESOURCE));
 
-  splitter_ = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxCLIP_CHILDREN);
+  auto* main_panel = new wxPanel(this);
+
+  splitter_ = new wxSplitterWindow(main_panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D | wxCLIP_CHILDREN);
 
   left_ = new wxTreeCtrl(splitter_,kIdLeftTree);
   right_ = new wxListView(splitter_, kIdRightList, wxDefaultPosition, wxDefaultSize,
@@ -124,6 +127,10 @@ ChildFrame::ChildFrame(wxDocument *doc,
 
   image_list_.Add(wxBitmap("TREE_LIST", wxBITMAP_TYPE_BMP_RESOURCE));
   left_->SetImageList(&image_list_);
+
+  auto* main_sizer = new wxBoxSizer(wxVERTICAL);
+  main_sizer->Add(splitter_, 1 , wxALIGN_LEFT | wxALL |wxEXPAND,0);
+  main_panel->SetSizerAndFit(main_sizer);
 }
 
 void ChildFrame::RedrawTreeList() {

@@ -28,7 +28,7 @@ class MessageQueue {
     return active_;
   }
 
-  [[nodiscard]] bool LogLevel() const {
+  [[nodiscard]] uint8_t LogLevel() const {
     return log_level_;
   }
 

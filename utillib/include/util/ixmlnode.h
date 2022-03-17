@@ -122,6 +122,17 @@ namespace util::xml {
   using ChildList = std::vector<const IXmlNode *>;
   virtual void GetChildList(ChildList &child_list) const = 0; ///< Returns the child nodes.
   virtual const IXmlNode *GetNode(const std::string &tag) const = 0; ///< Returns a node if it exist.
+
+  /** \brief Returns true if the named property exist.
+   *
+   * Returns true if the named property exists. This function is normally used when deciding if
+   * an attribute or a property key/value should be used.
+   * @param tag The name of the key (tag).
+   * @return True if it exist
+   */
+  [[nodiscard]] bool ExistProperty(const std::string& tag) const {
+    return GetNode(tag) != nullptr;
+  }
  protected:
   std::string tag_name_; ///< Name of this tag.
   std::string value_; ///< String value of this tag.

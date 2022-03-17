@@ -111,6 +111,18 @@ void ListenServerConnection::HandleMessage() {
       break;
     }
 
+    case ListenMessageType::LogLevel: {
+      auto msg = std::make_unique<LogLevelMessage>();
+      msg->FromHeaderBuffer(header_data_);
+      msg->FromBodyBuffer(body_data_);
+      server_.InMessage(std::move(msg));
+      break;
+    }
+
+    case ListenMessageType::TextMessage:
+      LOG_ERROR() << "Illegal text message received.";
+      break;
+
     default: {
       LOG_ERROR() << "Unknown message type. Type: " << static_cast<int>(header.type_);
       break;

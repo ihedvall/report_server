@@ -56,7 +56,6 @@ class ListenServer : public IListen {
 
   std::unique_ptr<MessageQueue> share_mem_queue_;
 
-
   void WorkerTask();
   void DoAccept();
   void DoCleanup();

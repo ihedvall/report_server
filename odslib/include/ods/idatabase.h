@@ -6,6 +6,8 @@
 #include <string>
 namespace ods {
 
+bool IsSqlReservedWord(const std::string& word);
+
 class IDatabase {
  public:
   virtual ~IDatabase() = default;

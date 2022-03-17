@@ -68,6 +68,21 @@ std::string GetLocalTimestampWithUs(TimeStamp timestamp = SystemClock::now());
  */
 std::string NsToLocalIsoTime(uint64_t ns_since_1970);
 
+/** \brief Converts a nanosecond since 1970 to a UTC ISO date and time string.
+ *
+ * @param [in] ns_since_1970 Nanosecond since 1970
+ * @return Return a date and time string in format YYYY-MM-DDThh:mm:ss.sssssssssZ
+ */
+std::string NsToIsoTime(uint64_t ns_since_1970, int format = 0);
+
+/** \brief Converts an ISO UTC string to nanosecond since 1970.
+ *
+ * @param [in] ISO Time stamp string YYYY-MM-DDThh:mm:ss.sssssssssZ
+ * @param [in] format 0: Include seconds, 1: Include ms, 2: include micro-seconds, 3: Include ns
+ * @return Return a date and time string in format
+ */
+uint64_t IsoTimeToNs(const std::string& iso_time);
+
 /** \brief Converts system clock to ns since midnight 1970.
  *
  *

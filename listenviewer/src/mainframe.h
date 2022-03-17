@@ -44,7 +44,6 @@ class MainFrame : public wxFrame {
   [[nodiscard]] bool FilterMessage(const util::log::detail::ListenTextMessage& msg) const;
 
   void OnExit(wxCommandEvent& event);
-  void OnClose(wxCloseEvent& event);
   void OnAbout(wxCommandEvent& event);
   void OnSetting(wxCommandEvent& event);
   void OnOpen(wxCommandEvent& event);

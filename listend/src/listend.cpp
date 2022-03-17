@@ -9,7 +9,6 @@
 #include <csignal>
 #include <thread>
 #include <chrono>
-#include <windows.h>
 
 #include <util/logconfig.h>
 #include <util/logstream.h>
@@ -185,9 +184,7 @@ int main(int nof_arg, char *arg_list[]) {
 
     while (!kStopMain) {
       std::this_thread::sleep_for(1000ms);
-      LOG_DEBUG() << "Test Message";
     }
-
 
     for (auto& server : kServerList) {
       if (!server) {

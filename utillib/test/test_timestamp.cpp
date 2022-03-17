@@ -77,6 +77,58 @@ TEST(Timestamp, GetCurrentTimestampWithUs) // NOLINT
   EXPECT_EQ(timestamp.size(), kTimestampUs.size()) << timestamp;
 }
 
+TEST(Timestamp, NsToLocalIsoTime) // NOLINT
+{
+  const auto iso_time1 = NsToLocalIsoTime(0);
+  EXPECT_FALSE(iso_time1.empty()) << iso_time1;
+
+  const auto iso_time2 = NsToLocalIsoTime(TimeStampToNs());
+  EXPECT_FALSE(iso_time2.empty()) << iso_time2;
+  std::cout << "Local ISO Time: " << iso_time2 << std::endl;
+}
+
+TEST(Timestamp, NsToIsoTime) // NOLINT
+{
+  const auto iso_time1 = NsToIsoTime(0);
+  EXPECT_FALSE(iso_time1.empty()) << iso_time1;
+  std::cout << "ISO Time: " << iso_time1 << std::endl;
+
+  const auto iso_time2 = NsToIsoTime(TimeStampToNs());
+  EXPECT_FALSE(iso_time2.empty()) << iso_time2;
+  std::cout << "ISO Time: " << iso_time2 << std::endl;
+
+  const auto iso_time3 = NsToIsoTime(TimeStampToNs(), 1);
+  EXPECT_FALSE(iso_time3.empty()) << iso_time3;
+  std::cout << "ISO Time: " << iso_time3 << std::endl;
+
+  const auto iso_time4 = NsToIsoTime(TimeStampToNs(), 2);
+  EXPECT_FALSE(iso_time4.empty()) << iso_time4;
+  std::cout << "ISO Time: " << iso_time4 << std::endl;
+
+  const auto iso_time5 = NsToIsoTime(TimeStampToNs(), 3);
+  EXPECT_FALSE(iso_time5.empty()) << iso_time5;
+  std::cout << "ISO Time: " << iso_time5 << std::endl;
+}
+
+TEST(Timestamp, IsoTimeToNs) // NOLINT
+{
+  const uint64_t time1 = 0;
+  const auto iso_time1 = NsToIsoTime(time1);
+  EXPECT_EQ(time1, IsoTimeToNs(iso_time1));
+
+  const uint64_t time2 = TimeStampToNs();
+  const auto iso_time2 = NsToIsoTime(time2, 1);
+  EXPECT_EQ(time2 / 1'000'000, IsoTimeToNs(iso_time2) / 1'000'000);
+
+  const uint64_t time3 = TimeStampToNs();
+  const auto iso_time3 = NsToIsoTime(time3, 2);
+  EXPECT_EQ(time3 / 1'000, IsoTimeToNs(iso_time3) / 1'000);
+
+  const uint64_t time4 = TimeStampToNs();
+  const auto iso_time4 = NsToIsoTime(time4, 3);
+  EXPECT_EQ(time4, IsoTimeToNs(iso_time4));
+}
+
 TEST(Timestamp, TimeStampToNs) // NOLINT
 {
   {

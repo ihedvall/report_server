@@ -175,7 +175,6 @@ std::vector<uint8_t> NsToCanOpenTimeArray(uint64_t ns_since_1970)  {
 uint64_t CanOpenTimeArrayToNs(const std::vector<uint8_t> &buffer) {
   boost::endian::little_uint32_buf_t ms; // Milliseconds since midnight
   memcpy(ms.data(), buffer.data(), 4);
-  const auto ms1 = ms.value();
 
   boost::endian::little_uint16_buf_t days; // Days since 1984-01-01
   memcpy(days.data(), buffer.data() + 4, 2);
@@ -193,7 +192,7 @@ uint64_t CanOpenTimeArrayToNs(const std::vector<uint8_t> &buffer) {
 }
 
 std::string NsToLocalIsoTime(uint64_t ns_since_1970) {
-  const auto ms_sec = (ns_since_1970 / 1'000'000) % 1'000;
+   const auto ms_sec = (ns_since_1970 / 1'000'000) % 1'000;
   const auto system_time = static_cast<std::time_t>(ns_since_1970 / 1'000'000'000);
   struct tm bt{};
   localtime_s(&bt, &system_time);
@@ -201,6 +200,110 @@ std::string NsToLocalIsoTime(uint64_t ns_since_1970) {
   text << std::put_time(&bt, "%Y-%m-%d %H:%M:%S")
        << '.' << std::setfill('0') << std::setw(3) << ms_sec;
   return text.str();
+}
+
+std::string NsToIsoTime(uint64_t ns_since_1970, int format) {
+  const auto system_time = static_cast<std::time_t>(ns_since_1970 / 1'000'000'000);
+  struct tm bt{};
+  gmtime_s(&bt, &system_time);
+
+  std::ostringstream text;
+  text << std::put_time(&bt, "%Y-%m-%dT%H:%M:%S");
+  switch (format) {
+    case 3: {
+      const auto ns_sec = ns_since_1970 % 1'000'000'000;
+      text << '.' << std::setfill('0') << std::setw(9) << ns_sec;
+      break;
+    }
+
+    case 2: {
+      const auto us_sec = (ns_since_1970 / 1'000) % 1'000'000;
+      text << '.' << std::setfill('0') << std::setw(6) << us_sec;
+      break;
+    }
+
+    case 1: {
+      const auto ms_sec = (ns_since_1970 / 1'000'000)  % 1'000;
+      text << '.' << std::setfill('0') << std::setw(3) << ms_sec;
+      break;
+    }
+
+    case 0:
+    default:
+      break;
+  }
+
+  text << "Z";
+  return text.str();
+}
+
+uint64_t IsoTimeToNs(const std::string& iso_time) {
+  if (iso_time.empty()) {
+    return 0;
+  }
+  std::vector<uint64_t> temp_list;
+  uint8_t ns_count = 0;
+  uint64_t temp = 0;
+  for (char input : iso_time) {
+    if (std::isdigit(input)) {
+      temp *= 10;
+      temp += input - '0';
+      if (temp_list.size() == 6) {
+        ++ns_count;
+      }
+    } else  {
+      temp_list.push_back(temp);
+      temp = 0;
+    }
+  }
+  uint64_t nano_sec = 0;
+  struct tm bt{};
+  for (size_t index = 0; index < temp_list.size(); ++index) {
+    int value = static_cast<int>(temp_list[index]);
+    switch (index) {
+      case 0:
+        if (value < 1970) {
+          value = 1970;
+        }
+        bt.tm_year = value - 1900; // Years since 1900
+        break;
+
+      case 1:
+        bt.tm_mon = value - 1; // Month 0..11
+        break;
+
+      case 2:
+        bt.tm_mday = value; // Day 1..31
+        break;
+
+      case 3:
+        bt.tm_hour = value;
+        break;
+
+      case 4:
+        bt.tm_min = value;
+        break;
+
+      case 5:
+        bt.tm_sec = value;
+        break;
+
+      case 6: {
+        nano_sec = temp_list[6];
+        for (; ns_count < 9; ++ns_count) {
+          nano_sec *= 10;
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+  auto ns_1970 = static_cast<uint64_t>(_mkgmtime(&bt));
+  ns_1970 *= 1'000'000'000;
+  ns_1970 += nano_sec;
+  return ns_1970;
 }
 
 std::string NsToLocalDate(uint64_t ns_since_1970) {

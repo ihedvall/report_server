@@ -23,7 +23,7 @@ class IChannelObserver : public ISampleObserver
  public:
   explicit IChannelObserver(const IChannel& channel);
 
-  virtual ~IChannelObserver() = default;
+  ~IChannelObserver() override = default;
 
   IChannelObserver() = delete;
   IChannelObserver(const IChannelObserver&) = delete;

@@ -165,27 +165,6 @@ void MainFrame::OnExit(wxCommandEvent & WXUNUSED(event)) {
   Close(true);
 }
 
-void MainFrame::OnClose(wxCloseEvent &event) {
-
-  // If the window is minimized. Do not save as last position
-  auto *app_config = wxConfig::Get();
-  if (!IsIconized()) {
-    bool maximized = IsMaximized();
-    wxPoint end_pos = GetPosition();
-    wxSize end_size = GetSize();
-    if (maximized) {
-      app_config->Write("/MainWin/Max", maximized);
-    } else {
-      app_config->Write("/MainWin/X", end_pos.x);
-      app_config->Write("/MainWin/Y", end_pos.y);
-      app_config->Write("/MainWin/XWidth", end_size.x);
-      app_config->Write("/MainWin/YWidth", end_size.y);
-      app_config->Write("/MainWin/Max", maximized);
-    }
-
-  }
-  event.Skip(true);
-}
 
 void MainFrame::OnAbout(wxCommandEvent &) { //NOLINT
   wxAboutDialogInfo info;
@@ -396,7 +375,23 @@ void MainFrame::HandleMessages(ListenClient& client) {
         break;
       }
 
-      case ListenMessageType::LogLevel:
+      case ListenMessageType::LogLevel: {
+        const auto* level = dynamic_cast<const LogLevelMessage*>(message.get());
+        if (level != nullptr && log_level_ != nullptr) {
+          int selection = 0;
+          for (const auto& itr : log_level_list_) {
+            if (level->log_level_ == itr.first) {
+              if (log_level_->GetSelection() != selection) {
+                log_level_->SetSelection(selection);
+              }
+              break;
+            }
+            ++selection;
+          }
+        }
+        break;
+      }
+
       default:
         break;
     }
