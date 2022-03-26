@@ -95,5 +95,39 @@ const IColumn *ITable::GetColumnByBaseName(const std::string &name) const {
   return itr == column_list_.cend() ? nullptr : &(*itr);
 }
 
+bool ITable::DeleteSubTable(int64_t application_id) {
+  for (auto itr = sub_table_list_.begin(); itr != sub_table_list_.end(); ++itr) {
+    if (itr->second.ApplicationId() == application_id) {
+      sub_table_list_.erase(itr);
+      return true;
+    }
+    const auto sub = itr->second.DeleteSubTable(application_id);
+    if (sub) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void ITable::DeleteColumn(const std::string &name) {
+  auto itr = std::ranges::find_if(column_list_, [&] (const auto& column) {
+    return util::string::IEquals(name,column.ApplicationName());
+  });
+  if (itr != column_list_.end()) {
+    column_list_.erase(itr);
+  }
+}
+
+void ITable::ParentId(int64_t id) {
+  // Scan through its columns and replace parent id references
+  std::ranges::for_each(column_list_, [&] (auto& column) {
+    const auto old_id = column.ReferenceId();
+    if (old_id > 0 && old_id == parent_id_) {
+      column.ReferenceId(id);
+    }
+  });
+  parent_id_ = id;
+}
+
 } // end namespace
 

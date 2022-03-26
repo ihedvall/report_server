@@ -33,9 +33,8 @@ class ITable {
   [[nodiscard]] int64_t ParentId() const {
     return parent_id_;
   }
-  void ParentId(int64_t id) {
-    parent_id_ = id;
-  }
+
+  void ParentId(int64_t id);
 
   [[nodiscard]] BaseId BaseId() const {
     return base_id_;
@@ -75,12 +74,23 @@ class ITable {
   [[nodiscard]] const SubTableList& SubTables() const {
     return sub_table_list_;
   }
+  [[nodiscard]] SubTableList& SubTables() {
+    return sub_table_list_;
+  }
 
   [[nodiscard]] const ColumnList & Columns() const {
     return column_list_;
   }
+
+  [[nodiscard]] ColumnList & Columns() {
+    return column_list_;
+  }
+
   void AddSubTable(const ITable& table);
   void AddColumn(const IColumn& column);
+
+  bool DeleteSubTable(int64_t application_id);
+  void DeleteColumn(const std::string& name);
 
   [[nodiscard]] const ITable* GetTable(int64_t application_id) const;
   [[nodiscard]] const ITable* GetTableByName(const std::string& name) const;
@@ -90,11 +100,12 @@ class ITable {
   [[nodiscard]] const IColumn* GetColumnByName(const std::string& name) const;
   [[nodiscard]] const IColumn* GetColumnByDbName(const std::string& name) const;
   [[nodiscard]] const IColumn* GetColumnByBaseName(const std::string& name) const;
+
  private:
 
   int64_t  application_id_ = 0; ///< Application ID. Shall be > 0.
   int64_t  parent_id_ = 0; ///< Parent table ID. 0 means no parent.
-  ods::BaseId base_id_ = BaseId::AoNotDefined; ///< ODS base ID.
+  ods::BaseId base_id_ = BaseId::AoAny; ///< ODS base ID.
 
   std::string application_name_; ///< Application name (max 30 characters).
   std::string database_name_; ///< Database table name (max 30 characters).

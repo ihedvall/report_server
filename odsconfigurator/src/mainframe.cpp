@@ -18,6 +18,22 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxDocMDIParentFrame)
   EVT_UPDATE_UI(wxID_SAVE, MainFrame::OnUpdateNoDoc)
   EVT_UPDATE_UI(wxID_SAVEAS, MainFrame::OnUpdateNoDoc)
   EVT_UPDATE_UI(wxID_CLOSE, MainFrame::OnUpdateNoDoc)
+
+  EVT_UPDATE_UI(kIdAddTable, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdEditTable, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdDeleteTable, MainFrame::OnUpdateNoDoc)
+
+  EVT_UPDATE_UI(kIdAddColumn, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdEditColumn, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdDeleteColumn, MainFrame::OnUpdateNoDoc)
+
+  EVT_UPDATE_UI(kIdAddEnum, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdEditEnum, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdDeleteEnum, MainFrame::OnUpdateNoDoc)
+
+  EVT_UPDATE_UI(kIdAddEnumItem, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdEditEnumItem, MainFrame::OnUpdateNoDoc)
+  EVT_UPDATE_UI(kIdDeleteEnumItem, MainFrame::OnUpdateNoDoc)
 wxEND_EVENT_TABLE()
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSize& start_size, bool maximized)
@@ -45,6 +61,29 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
   doc_manager->FileHistoryUseMenu(menu_file);
   doc_manager->FileHistoryLoad(*app_config);
 
+  // TABLE
+  auto *menu_table = new wxMenu;
+  menu_table->Append(kIdAddTable,wxGetStockLabel(wxID_ADD));
+  menu_table->Append(kIdEditTable, wxGetStockLabel(wxID_EDIT));
+  menu_table->Append(kIdDeleteTable, wxGetStockLabel(wxID_DELETE));
+
+  // COLUMN
+  auto *menu_column = new wxMenu;
+  menu_column->Append(kIdAddColumn,wxGetStockLabel(wxID_ADD));
+  menu_column->Append(kIdEditColumn, wxGetStockLabel(wxID_EDIT));
+  menu_column->Append(kIdDeleteColumn, wxGetStockLabel(wxID_DELETE));
+
+  // ENUM
+  auto *menu_enum = new wxMenu;
+  menu_enum->Append(kIdAddEnum,wxGetStockLabel(wxID_ADD));
+  menu_enum->Append(kIdEditEnum, wxGetStockLabel(wxID_EDIT));
+  menu_enum->Append(kIdDeleteEnum, wxGetStockLabel(wxID_DELETE));
+
+  // ITEM
+  auto *menu_item = new wxMenu;
+  menu_item->Append(kIdAddEnumItem,wxGetStockLabel(wxID_ADD));
+  menu_item->Append(kIdEditEnumItem, wxGetStockLabel(wxID_EDIT));
+  menu_item->Append(kIdDeleteEnumItem, wxGetStockLabel(wxID_DELETE));
 
   // ABOUT
   auto *menu_about = new wxMenu;
@@ -54,6 +93,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
 
   auto *menu_bar = new wxMenuBar;
   menu_bar->Append(menu_file, wxGetStockLabel(wxID_FILE));
+  menu_bar->Append(menu_table, L"Table");
+  menu_bar->Append(menu_column, L"Column");
+  menu_bar->Append(menu_enum, L"Enumerate");
+  menu_bar->Append(menu_item, L"Enumerate Item");
   menu_bar->Append(menu_about, wxGetStockLabel(wxID_HELP));
   wxFrameBase::SetMenuBar(menu_bar);
 }
@@ -119,6 +162,9 @@ void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) {
   auto* doc = man != nullptr ? man->GetCurrentDocument() : nullptr;
   if (doc == nullptr) {
     event.Enable(false);
+    event.Skip(false);
+  } else {
+    event.Skip(true);
   }
 }
 

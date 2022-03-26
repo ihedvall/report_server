@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 #include <vector>
+#include <filesystem>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
 #include <boost/process.hpp>
@@ -10,6 +11,7 @@
 
 #include "util/logging.h"
 #include "util/logconfig.h"
+#include "util/logstream.h"
 
 namespace {
 
@@ -102,6 +104,55 @@ std::string FindNotepad() {
   }
   return note;
 }
+
+bool BackupFiles(const std::string &filename, bool remove_file ) {
+  if (filename.empty()) {
+    LOG_ERROR() << "File name is empty. Illegal use of function";
+    return false;
+  }
+
+  try {
+    const std::filesystem::path full(filename);
+    const std::filesystem::path parent(full.parent_path());
+    const std::filesystem::path stem(full.stem());
+    const std::filesystem::path ext(full.extension());
+    if (!std::filesystem::exists(full)) {
+      return true; // No meaning to back up if original doesn't exist.
+    }
+    // shift all file xxx_N -> xxx_N-1 and last xxx -> xxx_0
+    for (int ii = 9; ii >= 0; --ii) {
+      std::ostringstream temp1;
+      temp1 << stem.string() << "_" << ii << ext.string();
+
+      std::filesystem::path file1(parent);
+      file1.append(temp1.str());
+      if (std::filesystem::exists(file1) && ii == 9) {
+        std::filesystem::remove(file1);
+      }
+      if (ii == 0) {
+        if (remove_file) {
+          std::filesystem::rename(full, file1);
+        } else {
+          std::filesystem::copy(full, file1);
+        }
+      } else {
+        std::ostringstream temp2;
+        temp2 << stem.string() << "_" << ii - 1 << ext.string();
+        std::filesystem::path file2(parent);
+        file2.append(temp2.str());
+        if (std::filesystem::exists(file2)) {
+          std::filesystem::rename(file2, file1);
+        }
+      }
+    }
+  } catch (const std::exception& error) {
+    LOG_ERROR() << "Backup of file failed. Error: " << error.what() << ", File: " << filename;
+    return false;
+  }
+  return true;
+}
+
+
 }
 
 

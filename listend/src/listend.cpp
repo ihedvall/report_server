@@ -129,7 +129,8 @@ int main(int nof_arg, char *arg_list[]) {
     // Read all configuration files and
     for (const auto &config_file: config_files) {
       auto xml_file = util::xml::CreateXmlFile();
-      xml_file->FileName(config_file);
+      std::unique_ptr<IXmlFile> receiver = xml_file;
+      receiver->filename_ = config_file;
       const auto parse = xml_file->ParseFile();
       if (!parse) {
         LOG_ERROR() << "Failed to parse the XML file. File: " << config_file;

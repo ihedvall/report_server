@@ -12,6 +12,7 @@ class CommonPanel : public wxPanel {
  public:
 
   explicit CommonPanel(wxWindow* parent);
+  ~CommonPanel() override;
 
   [[nodiscard]] OdsDocument* GetDocument() const;
   bool TransferDataToWindow() override;
@@ -26,6 +27,13 @@ class CommonPanel : public wxPanel {
   wxString base_version_;
   wxString modified_;
   wxString modified_by_;
+  wxString source_name_;
+  wxString source_type_;
+  wxString source_info_;
+  wxTimer  save_timer_;
+  void OnSaveTimer(wxTimerEvent& event);
+
+  wxDECLARE_EVENT_TABLE();
 };
 
 } // end namespace

@@ -2,6 +2,7 @@
  * Copyright 2022 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
+#include <algorithm>
 #include <string_view>
 #include <array>
 #include "ods/odsdef.h"
@@ -93,7 +94,68 @@ constexpr std::array<DataTypeDef,31> kDataTypeList = {
     DataTypeDef{31, "DsEnum", "DS_ENUM", "EnumSeq"},
 };
 
-}
+struct TypeSpecDef {
+  const int Type;
+  const std::string_view TypeName;
+};
+
+constexpr std::array<TypeSpecDef, 33>  kTypeSpecList = {
+    TypeSpecDef{0, "dt_boolean"},
+    TypeSpecDef{1, "dt_byte"},
+    TypeSpecDef{2, "dt_short"},
+    TypeSpecDef{3, "dt_long"},
+    TypeSpecDef{4, "dt_longlong"},
+    TypeSpecDef{5, "ieeefloat4"},
+    TypeSpecDef{6, "ieeefloat8"},
+    TypeSpecDef{7, "dt_short_beo"},
+    TypeSpecDef{8, "dt_long_beo"},
+    TypeSpecDef{9, "dt_longlong_beo"},
+    TypeSpecDef{10, "ieeefloat4_beo"},
+    TypeSpecDef{11, "ieeefloat8_beo"},
+    TypeSpecDef{12, "dt_string"},
+    TypeSpecDef{13, "dt_bytestr"},
+    TypeSpecDef{14, "dt_blob"},
+    TypeSpecDef{15, "dt_boolean_flags_beo"},
+    TypeSpecDef{16, "dt_byte_flags_beo"},
+    TypeSpecDef{17, "dt_string_flags_beo"},
+    TypeSpecDef{18, "dt_bytestr_beo"},
+    TypeSpecDef{19, "dt_sbyte"},
+    TypeSpecDef {20, "dt_sbyte_flags_beo"},
+    TypeSpecDef {21, "dt_ushort"},
+    TypeSpecDef{22, "dt_ushort_beo"},
+    TypeSpecDef {23, "dt_ulong"},
+    TypeSpecDef{24, "dt_ulong_beo"},
+    TypeSpecDef{25, "dt_string_utf8"},
+    TypeSpecDef{26, "dt_string_utf8_flags_beo"},
+    TypeSpecDef{27, "dt_bit_int"},
+    TypeSpecDef{28, "dt_bit_int_beo"},
+    TypeSpecDef{29, "dt_bit_uint"},
+    TypeSpecDef{30, "dt_bit_uint_beo"},
+    TypeSpecDef {31, "dt_bit_ieeefloat"},
+    TypeSpecDef{32, "dt_bit_ieeefloat_beo"},
+};
+
+struct SeqDef {
+  const int Type;
+  const std::string_view TypeName;
+};
+constexpr std::array<SeqDef,12> kSequenceList = {
+    SeqDef{0, "explicit"},
+    SeqDef{1, "implicit_constant"},
+    SeqDef{2, "implicit_linear"},
+    SeqDef{3, "implicit_saw"},
+    SeqDef{4, "raw_linear"},
+    SeqDef{5, "raw_polynomial"},
+    SeqDef{6, "formula"},
+    SeqDef{7,"external_component"},
+    SeqDef{8,"raw_linear_external"},
+    SeqDef{9,"raw_polynomial_external"},
+    SeqDef{10, "raw_linear_calibrated"},
+    SeqDef{11, "raw_linear_calibrated_external"},
+};
+
+} // end namespace
+
 namespace ods {
 
 BaseId TextToBaseId(const std::string &text) {
@@ -103,27 +165,29 @@ BaseId TextToBaseId(const std::string &text) {
   } catch(const std::exception&) {
     // Normal if not an integer
   }
-
-  for (const auto base : kBaseIdList) {
-    if (temp == base.BaseId ||
-       IEquals(text,base.BaseName1.data()) ||
-       IEquals(text,base.BaseName2.data())) {
-      return static_cast<BaseId>(base.BaseId);
-    }
-  }
-  return BaseId::AoNotDefined;
+  const auto itr = std::ranges::find_if(kBaseIdList, [&] (const auto& base) {
+      return temp == base.BaseId ||IEquals(text,base.BaseName1.data()) ||
+          IEquals(text,base.BaseName2.data());
+  });
+  return itr == kBaseIdList.cend() ? BaseId::AoNotDefined : static_cast<BaseId>(itr->BaseId);
 }
 
 std::string BaseIdToText(BaseId base) {
   const int temp = static_cast<int> (base);
-
-  for (const auto bid : kBaseIdList) {
-    if (temp == bid.BaseId) {
-      return bid.BaseName1.data();
-    }
-  }
-  return "AoNotDefined";
+  const auto itr = std::ranges::find_if(kBaseIdList, [&] (const auto& base) {
+    return temp == base.BaseId;
+  });
+  return itr == kBaseIdList.cend() ? "": itr->BaseName1.data();
 }
+
+std::string BaseIdToUserText(BaseId base) {
+  const int temp = static_cast<int> (base);
+  const auto itr = std::ranges::find_if(kBaseIdList, [&] (const auto& base) {
+    return temp == base.BaseId;
+  });
+  return itr == kBaseIdList.cend() ? "": itr->BaseName2.data();
+}
+
 DataType TextToDataType(const std::string &text) {
   int temp = -1;
   try {
@@ -163,6 +227,37 @@ std::string DataTypeToUserText(DataType type) {
     }
   }
   return "Unknown";
+}
+IEnum CreateDefaultEnum(const std::string &enum_name) {
+  IEnum enumerate;
+  enumerate.EnumName(enum_name);
+  enumerate.Locked(true);
+  if (IEquals(enum_name, "ao_storagetype_enum")) {
+    enumerate.AddItem(0, "database");
+    enumerate.AddItem(1, "external_only");
+    enumerate.AddItem(2, "mixed");
+    enumerate.AddItem(3, "foreign_format");
+  } else if (IEquals(enum_name, "datatype_enum")) {
+    for (const auto& type : kDataTypeList) {
+      if ( (type.DataType >= 0 && type.DataType <= 14) ||
+           type.DataType == 28 || type.DataType == 30) {
+        enumerate.AddItem(type.DataType, type.TypeName2.data());
+      }
+    }
+  } else if (IEquals(enum_name, "interpolation_enum")) {
+    enumerate.AddItem(0, "no_interpolation");
+    enumerate.AddItem(1, "linear_interpolation");
+    enumerate.AddItem(2, "application_specific");
+  } else if (IEquals(enum_name, "seq_rep_enum")) {
+    for (const auto& type : kSequenceList) {
+      enumerate.AddItem(type.Type, type.TypeName.data());
+    }
+  } else if (IEquals(enum_name, "typespec_enum")) {
+    for (const auto& type : kTypeSpecList) {
+      enumerate.AddItem(type.Type, type.TypeName.data());
+    }
+  }
+  return enumerate;
 }
 }
 

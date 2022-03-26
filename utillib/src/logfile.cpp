@@ -10,6 +10,7 @@
 #include "util/logconfig.h"
 #include "util/timestamp.h"
 #include "util/logstream.h"
+#include "util/logging.h"
 
 using namespace std::filesystem;
 using namespace std::chrono_literals;
@@ -67,40 +68,6 @@ std::string FindLogPath(const std::string& base_name) {
   } catch (const std::exception &error) {
     std::cerr << "FindLogPath(). Error: " << error.what() << std::endl;
     throw error; // No meaning to log the error to file
-  }
-}
-
-void BackupFiles(const std::string &filename) {
-  if (filename.empty()) {
-    return;
-  }
-  path f(filename);
-  path p(f.parent_path());
-  path s(f.stem());
-  if (!exists(f)) {
-    return; // no meaning to back up if original doesn't exist
-  }
-  // shift all file xxx_N -> xxx_N-1 and last xxx -> xxx_0
-  for (int ii = 9; ii >= 0; --ii) {
-    std::ostringstream temp1;
-    temp1 << s.string() << "_" << ii << ".log";
-
-    path f1(p);
-    f1.append(temp1.str());
-    if (exists(f1) && ii == 9) {
-      remove(f1);
-    }
-    if (ii == 0) {
-      rename(f, f1);
-    } else {
-      std::ostringstream temp2;
-      temp2 << s.string() << "_" << ii - 1 << ".log";
-      path f2(p);
-      f2.append(temp2.str());
-      if (exists(f2)) {
-        rename(f2, f1);
-      }
-    }
   }
 }
 }

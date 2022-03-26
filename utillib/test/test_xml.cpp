@@ -44,7 +44,8 @@ namespace util::test {
 
 TEST(IXmlFile, ParseString) //NOLINT
 {
-  std::unique_ptr<IXmlFile> f(std::move(CreateXmlFile()));
+  std::unique_ptr<IXmlFile> f = CreateXmlFile();
+
   EXPECT_TRUE(f->ParseString(kNormalXml.data()));
   EXPECT_EQ(f->Property<std::string>("Tag1"), std::string("Text"));
   EXPECT_EQ(f->Property<int>("Tag2"), 123);

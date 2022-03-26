@@ -5,10 +5,8 @@
 #include <sstream>
 #include <filesystem>
 #include <wx/msgdlg.h>
-#include "util/logstream.h"
+#include <util/logging.h>
 #include "odsdocument.h"
-
-using namespace util::log;
 
 namespace {
 
@@ -21,15 +19,6 @@ wxBEGIN_EVENT_TABLE(OdsDocument, wxDocument) // NOLINT
   EVT_UPDATE_UI(wxID_SAVE, OdsDocument::OnUpdateSave)
 wxEND_EVENT_TABLE()
 
-bool OdsDocument::OnOpenDocument(const wxString &filename) {
-  wxBusyCursor wait;
-  const auto read = model_.ReadModel(filename.ToStdString());
-  if (!read) {
-    return false;
-  }
-  Modify(false);
-  return wxDocument::OnOpenDocument(filename);
-}
 
 void OdsDocument::OnUpdateSave(wxUpdateUIEvent &event) {
   try {
@@ -45,19 +34,43 @@ void OdsDocument::OnUpdateSave(wxUpdateUIEvent &event) {
   event.Enable(IsModified());
 }
 
-bool OdsDocument::IsModified() const {
-  return !(original_ == model_);
-}
-
 OdsDocument::OdsDocument() {
   model_ = original_;
 }
 
-void OdsDocument::Modify(bool mod) {
-  if (!mod) {
-    original_ = model_;
+void OdsDocument::UpdateModified() {
+  if (original_ == model_) {
+    if (IsModified()) {
+      Modify(false);
+    }
+  } else  {
+    if (!IsModified()) {
+      Modify(true);
+    }
   }
-  wxDocument::Modify(mod);
 }
 
+ITable *OdsDocument::GetSelectedTable() {
+  if (selected_table_ == 0) {
+    return nullptr;
+  }
+  const auto* table = model_.GetTable(selected_table_);
+  return table == nullptr ? nullptr : const_cast<ITable*>(table);
+}
+
+bool OdsDocument::DoSaveDocument(const wxString &file) {
+  util::log::BackupFiles(file.ToStdString(), true);
+
+  return model_.SaveModel(file.ToStdString());
+}
+
+bool OdsDocument::DoOpenDocument(const wxString &file) {
+  wxBusyCursor wait;
+  const auto read = model_.ReadModel(file.ToStdString());
+  if (!read) {
+    return false;
+  }
+  original_ = model_;
+  return true;
+}
 } // namespace mdf::viewer

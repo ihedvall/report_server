@@ -24,42 +24,42 @@ class IModel {
 
   bool operator == (const IModel& model) const = default;
 
-  [[nodiscard]] std::string Name() const {
+  [[nodiscard]] const std::string& Name() const {
     return name_;
   }
   void Name(const std::string& name) {
     name_ = name;
   }
 
-  [[nodiscard]] std::string Version() const {
+  [[nodiscard]] const std::string& Version() const {
     return version_;
   }
   void Version(const std::string& version) {
     version_ = version;
   }
 
-  [[nodiscard]] std::string Description() const {
+  [[nodiscard]] const std::string& Description() const {
     return description_;
   }
   void Description(const std::string& desc) {
     description_ = desc;
   }
 
-  [[nodiscard]] std::string CreatedBy() const {
+  [[nodiscard]] const std::string& CreatedBy() const {
     return created_by_;
   }
   void CreatedBy(const std::string& creator) {
     created_by_ = creator;
   }
 
-  [[nodiscard]] std::string ModifiedBy() const {
+  [[nodiscard]] const std::string& ModifiedBy() const {
     return modified_by_;
   }
   void ModifiedBy(const std::string& creator) {
     modified_by_ = creator;
   }
 
-  [[nodiscard]] std::string BaseVersion() const {
+  [[nodiscard]] const std::string& BaseVersion() const {
     return base_version_;
   }
   void BaseVersion(const std::string& version) {
@@ -80,8 +80,34 @@ class IModel {
     modified_ = ns1970;
   }
 
+  [[nodiscard]] const std::string& SourceName() const {
+    return source_name_;
+  }
+  void SourceName(const std::string& name) {
+    source_name_ = name;
+  }
+
+  [[nodiscard]] const std::string& SourceType() const {
+    return source_type_;
+  }
+  void SourceType(const std::string& type) {
+    source_type_ = type;
+  }
+
+  [[nodiscard]] const std::string& SourceInfo() const {
+    return source_info_;
+  }
+  void SourceInfo(const std::string& info) {
+    source_info_ = info;
+  }
+
   void AddTable(const ITable& table);
+  bool DeleteTable(int64_t application_id);
+
   void AddEnum(const IEnum& obj);
+  void DeleteEnum(const std::string& name);
+
+  [[nodiscard ]] int64_t FindNextTableId(int64_t parent_id) const;
 
   [[nodiscard]] const EnumList& Enums() const {
     return enum_list_;
@@ -89,6 +115,7 @@ class IModel {
   [[nodiscard]] const TableList& Tables() const {
     return table_list_;
   }
+  [[nodiscard]] std::vector<const ITable*> AllTables() const;
 
   [[nodiscard]] const IEnum* GetEnum(const std::string& name) const;
 
@@ -97,8 +124,8 @@ class IModel {
   [[nodiscard]] const ITable* GetTableByDbName(const std::string& name) const;
   [[nodiscard]] const ITable* GetBaseId(BaseId base) const;
 
-  bool ReadModel(const std::string& filename);
-
+  [[nodiscard]] bool ReadModel(const std::string& filename);
+  [[nodiscard]] bool SaveModel(const std::string& filename) const;
  private:
   std::string name_ = "New model";
   std::string version_ = "1.0.0";
@@ -111,9 +138,11 @@ class IModel {
   uint64_t created_ =  util::time::TimeStampToNs();
   uint64_t modified_ = util::time::TimeStampToNs();
 
+  std::string source_name_;
+  std::string source_type_;
+  std::string source_info_;
 
   TableList table_list_;
-
 
   EnumList enum_list_;
 

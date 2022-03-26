@@ -35,6 +35,7 @@ class ExpatXml final :  public util::xml::IXmlFile {
   void XmlDecl(const XML_Char *version,
                  const XML_Char *encoding,
                  int standalone); ///< Parser callback
+ protected:
  private:
   using NodeStack = std::stack<XmlNode *>; ///< Temporary parser stack
   NodeStack node_stack_;

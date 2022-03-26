@@ -41,7 +41,7 @@ add_library(util STATIC
         include/util/threadsafequeue.h
         src/listenserverconnection.h src/listenserverconnection.cpp
         src/listenconfig.cpp include/util/listenconfig.h
-        src/listenclient.cpp src/listenclient.h src/listenlogger.cpp src/listenlogger.h)
+        src/listenclient.cpp src/listenclient.h src/listenlogger.cpp src/listenlogger.h src/writexml.cpp src/writexml.h)
 
 target_include_directories(util PUBLIC
         $<INSTALL_INTERFACE:include>

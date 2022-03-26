@@ -34,9 +34,8 @@ void ReadColumn(const IXmlNode& node, ods::ITable& table) {
   col.Description(node.Property<std::string>("Description"));
   col.DisplayName(node.Property<std::string>("DisplayName"));
   col.BaseName(node.Property<std::string>("BaseName"));
-
   col.ReferenceName(node.Property<std::string>("RefColumnName"));
-
+  col.DefaultValue(node.Property<std::string>("DefaultValue"));
 
   col.ReferenceId(node.Property<int64_t>("RefId"));
 
@@ -90,20 +89,176 @@ void ReadColumn(const IXmlNode& node, ods::ITable& table) {
   table.AddColumn(col);
 }
 
+void SaveEnum(const ods::IEnum& enum1, IXmlNode &root) {
+  auto& node = root.AddNode("Enumerate");
+  node.SetAttribute("name",enum1.EnumName());
+  node.SetAttribute("locked",enum1.Locked());
+  const auto& item_list = enum1.Items();
+  for (const auto& itr : item_list) {
+    auto &item_node = node.AddNode("Item");
+    item_node.SetAttribute("number", itr.first);
+    item_node.SetAttribute("value", itr.second);
+  }
+}
+
+void SaveColumn(const ods::IColumn& column, IXmlNode& root) {
+  auto& node = root.AddNode("Attribute");
+  node.SetAttribute("name", column.ApplicationName());
+  if (!column.DatabaseName().empty()) {
+    node.SetAttribute("column", column.DatabaseName());
+  }
+  if (!column.Description().empty()) {
+    node.SetProperty("Description", column.Description());
+  }
+  if (!column.DisplayName().empty()) {
+    node.SetProperty("DisplayName", column.DisplayName());
+  }
+  if (!column.BaseName().empty()) {
+    node.SetProperty("BaseName", column.BaseName());
+  }
+  const auto data_type = column.DataType();
+  auto& type = node.AddNode("Type");
+  type.Value(ods::DataTypeToText(column.DataType()));
+  if (!column.Unit().empty()) {
+    type.SetAttribute("unit", column.Unit());
+  }
+  if (!column.EnumName().empty()) {
+    type.SetAttribute("enum", column.EnumName());
+  }
+  if (data_type == ods::DataType::DtFloat || data_type == ods::DataType::DtDouble) {
+    type.SetAttribute("decimals", column.NofDecimals());
+  }
+  if (column.DataLength() > 0) {
+    type.SetAttribute("decimals", column.DataLength());
+  }
+
+
+  if (column.Flags() > 0) {
+    auto& flags = node.AddNode("Flags");
+    flags.Value(column.Flags());
+    if (column.Auto()) {
+      flags.SetAttribute("auto", true);
+    }
+    if (column.Unique()) {
+      flags.SetAttribute("unique", true);
+    }
+    if (column.Index()) {
+      flags.SetAttribute("index", true);
+    }
+    if (column.Obligatory()) {
+      flags.SetAttribute("obligatory", true);
+    }
+    if (column.CaseSensitive()) {
+      flags.SetAttribute("casesensitive", true);
+    }
+  }
+
+  if (column.ReferenceId() > 0) {
+    node.SetProperty("RefId", column.ReferenceId());
+  }
+  if (!column.ReferenceName().empty()) {
+    node.SetProperty("RefColumnName", column.ReferenceName());
+  }
+  if (!column.DefaultValue().empty()) {
+    node.SetProperty("DefaultValue", column.ReferenceName());
+  }
+}
+
+void SaveTable(const ods::ITable& table, IXmlNode &root) {
+  auto& node = root.AddNode("Element");
+  node.SetAttribute("id", table.ApplicationId());
+  node.SetAttribute("name", table.ApplicationName());
+  node.SetAttribute("base", BaseIdToText(table.BaseId()));
+  if (!table.DatabaseName().empty()) {
+    node.SetAttribute("table", table.DatabaseName());
+  }
+  if (table.ParentId() > 0) {
+    node.SetAttribute("parent", table.ParentId());
+  }
+  if (!table.Description().empty()) {
+    node.SetProperty("Description", table.Description());
+  }
+  if (table.SecurityMode() > 0) {
+    node.SetProperty("SecurityMode", table.SecurityMode());
+  }
+
+  const auto& column_list = table.Columns();
+  for (const auto& column : column_list) {
+    SaveColumn(column, node);
+  }
+}
+
+void AddSubTable(const ods::ITable& table, std::vector<const ods::ITable*>& list) { //NOLINT
+  const auto& sub_table_list = table.SubTables();
+  for (const auto& itr : sub_table_list) {
+    list.push_back(&itr.second);
+    AddSubTable(itr.second, list);
+  }
+}
+
 }
 namespace ods {
 
-void IModel::AddTable(const ITable &table) {
-  auto* parent = table.ParentId() != 0 ? const_cast<ITable*>(GetTable(table.ParentId())) : nullptr;
+void IModel::AddTable(const ITable &table) { //NOLINT
+  ITable copy = table;
+  const auto old_app_id = copy.ApplicationId();
+  if (old_app_id <= 0 || GetTable(old_app_id) != nullptr) {
+    copy.ApplicationId(FindNextTableId(copy.ParentId()));
+  }
+  // Remove all sub-table and add them later
+  auto& table_list = copy.SubTables();
+  std::vector<ITable> temp_list;
+  temp_list.reserve(table_list.size());
+  for (const auto& itr : table_list) {
+    temp_list.push_back(itr.second);
+  }
+  table_list.clear();
+
+  auto* parent = copy.ParentId() != 0 ? const_cast<ITable*>(GetTable(copy.ParentId())) : nullptr;
   if (parent != nullptr) {
-    parent->AddSubTable(table);
+    parent->AddSubTable(copy);
   } else {
-    table_list_.insert({table.ApplicationId(), table});
+    table_list_.insert({copy.ApplicationId(), copy});
+  }
+
+  // Add all sub-tables again so they get the right references
+  for (auto& sub_table : temp_list) {
+    sub_table.ParentId(copy.ApplicationId());
+    sub_table.ApplicationId(0);
+    AddTable(sub_table);
+  }
+
+  // Add any missing enumerates
+  const auto& column_list = copy.Columns();
+  for (const auto& column : column_list) {
+    const std::string& enum_name = column.EnumName();
+    if (enum_name.empty()) {
+      continue;
+    }
+    const bool exist = GetEnum(enum_name) != nullptr;
+    if (exist) {
+      continue;
+    }
+    IEnum def = CreateDefaultEnum(enum_name);
+    AddEnum(def);
+    LOG_DEBUG() << "Added missing enumerate. Enum: " << enum_name;
   }
 }
 
 void IModel::AddEnum(const IEnum& obj) {
-  enum_list_.insert({obj.EnumName(), obj});
+  auto itr = enum_list_.find(obj.EnumName());
+  if (itr == enum_list_.end()) {
+    enum_list_.insert({obj.EnumName(), obj});
+  } else {
+    itr->second = obj;
+  }
+}
+
+void IModel::DeleteEnum(const std::string& name) {
+  auto itr = enum_list_.find(name);
+  if (itr != enum_list_.end()) {
+    enum_list_.erase(itr);
+  }
 }
 
 bool IModel::ReadModel(const std::string &filename) {
@@ -141,6 +296,10 @@ bool IModel::ReadModel(const std::string &filename) {
   Created(IsoTimeToNs(xml_file->Property("Created",std::string(""))));
   Modified(IsoTimeToNs(xml_file->Property("Modified",std::string(""))));
 
+  SourceName(xml_file->Property("SourceName",std::string()));
+  SourceType(xml_file->Property("SourceType",std::string()));
+  SourceInfo(xml_file->Property("SourceInfo",std::string()));
+
   if (Modified() == 0) {
     try {
       std::filesystem::path file(filename);
@@ -155,24 +314,38 @@ bool IModel::ReadModel(const std::string &filename) {
     Created(Modified());
   }
 
+  const auto& env_type = xml_file->Property("SourceEnvType", std::string());
+  if (SourceType().empty() && !env_type.empty()) {
+    SourceType(env_type);
+  }
+
   IXmlNode::ChildList node_list;
   xml_file->GetChildList(node_list);
-  for (const auto& node : node_list) {
-    if (!node) {
+
+  // Read in all enumerates first and then the tables
+  for (const auto& node_enum : node_list) {
+    if (!node_enum) {
       continue;
     }
-    if (node->IsTagName("Enum") || node->IsTagName("Enumerate")) {
-      ReadEnum(*node);
-    } else if (node->IsTagName("EnumList")) {
+    if (node_enum->IsTagName("Enum") || node_enum->IsTagName("Enumerate")) {
+      ReadEnum(*node_enum);
+    } else if (node_enum->IsTagName("EnumList")) {
        IXmlNode::ChildList enum_list;
-       node->GetChildList(enum_list);
+       node_enum->GetChildList(enum_list);
        for (const auto& node1 : enum_list) {
-         if (node1->IsTagName("Enum")) {
+         if (node1->IsTagName("Enum") || node1->IsTagName("Enumerate")) {
            ReadEnum(*node1);
          }
        }
-    } else if (node->IsTagName("Element") || node->IsTagName("Table")) {
-      ReadTable(*node);
+    }
+  }
+
+  for (const auto& node_table : node_list) {
+    if (!node_table) {
+      continue;
+    }
+    if (node_table->IsTagName("Element") || node_table->IsTagName("Table")) {
+      ReadTable(*node_table);
     }
   }
   return true;
@@ -207,6 +380,8 @@ void IModel::ReadEnum(const IXmlNode &node) {
   AddEnum(obj);
 }
 
+
+
 void IModel::ReadTable(const IXmlNode &node) {
   ITable table;
   if (node.ExistProperty("Id")) {
@@ -222,12 +397,10 @@ void IModel::ReadTable(const IXmlNode &node) {
   }
 
   if (node.ExistProperty("BaseId")) {
-    table.BaseId(static_cast<BaseId>(node.Property<int>("BaseId")));
+    table.BaseId( TextToBaseId(node.Property<std::string>("BaseId")) );
   } else {
-    table.BaseId(static_cast<BaseId>(node.Attribute<int>("base")));
+    table.BaseId( TextToBaseId(node.Attribute<std::string>("base")) );
   }
-
-  table.BaseId(static_cast<BaseId>(node.Property<int>("BaseId")));
 
   if (node.ExistProperty("Name")) {
     table.ApplicationName(node.Property<std::string>("Name"));
@@ -249,6 +422,8 @@ void IModel::ReadTable(const IXmlNode &node) {
   }
   AddTable(table);
 }
+
+
 
 const ITable *IModel::GetTable(int64_t application_id) const {
   const auto itr = table_list_.find(application_id);
@@ -308,4 +483,95 @@ const ITable *IModel::GetTableByDbName(const std::string &name) const {
   }
   return nullptr;
 }
+
+int64_t IModel::FindNextTableId(int64_t parent_id) const {
+  if (parent_id <= 0) {
+    if (table_list_.empty()) {
+      return 1;
+    }
+    for (int64_t table_id = 10; table_id < 10'000; table_id += 10) {
+      const auto* exist = GetTable(table_id);
+      if (exist == nullptr) {
+        return table_id;
+      }
+    }
+  }
+
+  for (int64_t table_id = parent_id; table_id < (parent_id + 100); ++table_id) {
+    const auto* exist = GetTable(table_id);
+    if (exist == nullptr) {
+      return table_id;
+    }
+  }
+  for (int64_t table_id = 1; table_id < 1'000; ++table_id) {
+    const auto* exist = GetTable(table_id);
+    if (exist == nullptr) {
+      return table_id;
+    }
+  }
+  return 0;
+}
+
+bool IModel::DeleteTable(int64_t application_id) {
+  for (auto itr = table_list_.begin(); itr != table_list_.end(); ++itr) {
+    if (itr->second.ApplicationId() == application_id) {
+      table_list_.erase(itr);
+      return true;
+    }
+    const auto sub = itr->second.DeleteSubTable(application_id);
+    if (sub) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::vector<const ITable*> IModel::AllTables() const {
+  std::vector<const ITable*> list;
+  for (const auto& itr : table_list_) {
+    list.emplace_back(&itr.second);
+    AddSubTable(itr.second, list);
+  }
+  return list;
+}
+
+bool IModel::SaveModel(const std::string &filename) const {
+  auto xml_file = CreateXmlFile("FileWriter");
+  if (!xml_file) {
+    LOG_ERROR() << "Failed to create the XML File. File: " << filename;
+    return false;
+  }
+  xml_file->FileName(filename);
+  auto &root = xml_file->RootName("OdsModel");
+  xml_file->SetProperty("Version", 2);
+  xml_file->SetProperty("Name", Name());
+  xml_file->SetProperty("ApplicationVersion", Version());
+  xml_file->SetProperty("Description", Description());
+  xml_file->SetProperty("CreatedBy", CreatedBy());
+  xml_file->SetProperty("ModifiedBy", ModifiedBy());
+  xml_file->SetProperty("BaseVersion", BaseVersion());
+
+  xml_file->SetProperty("Created", NsToIsoTime(Created()));
+  xml_file->SetProperty("Modified", NsToIsoTime(Created()));
+
+  xml_file->SetProperty("SourceName", SourceName());
+  xml_file->SetProperty("SourceType", SourceType());
+  xml_file->SetProperty("SourceInfo", SourceInfo());
+
+  auto &enum_root = root.AddNode("EnumList");
+  const auto &enum_list = Enums();
+  for (const auto &enum1: enum_list) {
+    SaveEnum(enum1.second, enum_root);
+  }
+  const auto table_list = AllTables();
+  for (const auto *table: table_list) {
+    if (table == nullptr) {
+      continue;
+    }
+    SaveTable(*table, root);
+  }
+  return xml_file->WriteFile();
+}
+
+
 } // end namespace

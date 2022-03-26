@@ -4,52 +4,61 @@
  */
 #include <sstream>
 #include <filesystem>
+#include <wx/richmsgdlg.h>
 #include "childframe.h"
 #include "odsconfigid.h"
 #include "commonpanel.h"
 #include "tablepanel.h"
 #include "enumpanel.h"
-
+#include "tabledialog.h"
 namespace {
 
-// Bitmap index for the tree control (tree_list.bmp)
-constexpr int TREE_ROOT = 0;
-constexpr int TREE_ID = 1;
-constexpr int TREE_HD = 2;
-constexpr int TREE_FH_ROOT = 3;
-constexpr int TREE_FH = 4;
-constexpr int TREE_DG_ROOT = 5;
-constexpr int TREE_DG = 6;
-constexpr int TREE_AT_ROOT = 7;
-constexpr int TREE_AT = 8;
-constexpr int TREE_CH_ROOT = 9;
-constexpr int TREE_CH = 10;
-constexpr int TREE_EV_ROOT = 11;
-constexpr int TREE_EV = 12;
-constexpr int TREE_CG = 13;
-constexpr int TREE_SI = 14;
-constexpr int TREE_CN = 15;
-constexpr int TREE_CC = 16;
-constexpr int TREE_CA = 17;
-constexpr int TREE_DT = 18;
-constexpr int TREE_SR = 19;
-constexpr int TREE_RD = 20;
-constexpr int TREE_SD = 21;
-constexpr int TREE_DL = 22;
-constexpr int TREE_DZ = 23;
-constexpr int TREE_HL = 24;
-
+// Defines the page number in the notebook.
+constexpr int kCommonPanel = 0;
+constexpr int kTablePanel = 1;
+constexpr int kEnumPanel = 2;
+constexpr int kRelationPanel = 3;
 
 } // Empty namespace
 
 namespace ods::gui {
 
 wxBEGIN_EVENT_TABLE(ChildFrame, wxDocMDIChildFrame) // NOLINT(cert-err58-cpp)
-  EVT_UPDATE_UI(kIdSave, ChildFrame::OnUpdateSave)
-  EVT_BUTTON(kIdSave, ChildFrame::OnSave)
-  EVT_BUTTON(kIdSaveAs, ChildFrame::OnSaveAs)
-  EVT_BUTTON(kIdClose, ChildFrame::OnCloseDoc)
+  EVT_UPDATE_UI(wxID_SAVE, ChildFrame::OnUpdateSave)
+  EVT_BUTTON(wxID_SAVE, ChildFrame::OnSave)
+  EVT_BUTTON(wxID_SAVEAS, ChildFrame::OnSaveAs)
+  EVT_BUTTON(wxID_CLOSE, ChildFrame::OnCloseDoc)
   EVT_NOTEBOOK_PAGE_CHANGED(kIdNotebook, ChildFrame::OnPageChange)
+
+  EVT_UPDATE_UI(kIdAddTable, ChildFrame::OnUpdateTable)
+  EVT_UPDATE_UI(kIdEditTable, ChildFrame::OnUpdateTableSelected)
+  EVT_UPDATE_UI(kIdDeleteTable, ChildFrame::OnUpdateTableSelected)
+  EVT_UPDATE_UI(kIdCopyTable, ChildFrame::OnUpdateTableSelected)
+  EVT_MENU(kIdAddTable, ChildFrame::OnAddTable)
+  EVT_MENU(kIdEditTable, ChildFrame::OnEditTable)
+  EVT_MENU(kIdDeleteTable, ChildFrame::OnDeleteTable)
+
+  EVT_UPDATE_UI(kIdAddColumn, ChildFrame::OnUpdateTableSelected)
+  EVT_UPDATE_UI(kIdEditColumn, ChildFrame::OnUpdateSingleColumnSelected)
+  EVT_UPDATE_UI(kIdDeleteColumn, ChildFrame::OnUpdateColumnSelected)
+  EVT_MENU(kIdAddColumn, ChildFrame::OnAddColumn)
+  EVT_MENU(kIdEditColumn, ChildFrame::OnEditColumn)
+  EVT_MENU(kIdDeleteColumn, ChildFrame::OnDeleteColumn)
+
+  EVT_UPDATE_UI(kIdAddEnum, ChildFrame::OnUpdateEnum)
+  EVT_UPDATE_UI(kIdEditEnum, ChildFrame::OnUpdateSingleEnumSelected)
+  EVT_UPDATE_UI(kIdDeleteEnum, ChildFrame::OnUpdateEnumSelected)
+  EVT_MENU(kIdAddEnum, ChildFrame::OnAddEnum)
+  EVT_MENU(kIdEditEnum, ChildFrame::OnEditEnum)
+  EVT_MENU(kIdDeleteEnum, ChildFrame::OnDeleteEnum)
+
+  EVT_UPDATE_UI(kIdAddEnumItem, ChildFrame::OnUpdateSingleEnumSelected)
+  EVT_UPDATE_UI(kIdEditEnumItem, ChildFrame::OnUpdateSingleEnumItemSelected)
+  EVT_UPDATE_UI(kIdDeleteEnumItem, ChildFrame::OnUpdateEnumItemSelected)
+  EVT_MENU(kIdAddEnumItem, ChildFrame::OnAddEnumItem)
+  EVT_MENU(kIdEditEnumItem, ChildFrame::OnEditEnumItem)
+  EVT_MENU(kIdDeleteEnumItem, ChildFrame::OnDeleteEnumItem)
+
 wxEND_EVENT_TABLE()
 
 ChildFrame::ChildFrame(wxDocument *doc,
@@ -75,9 +84,9 @@ ChildFrame::ChildFrame(wxDocument *doc,
   notebook_->AddPage(enumerate, L"Enumerations", false,6);
   //notebook_->AddPage(relation, L"M:N Relations", false,7);
 
-  auto* save_button = new wxButton(this, kIdSave, wxGetStockLabel(wxID_SAVE));
-  auto* save_as_button = new wxButton(this, kIdSaveAs, wxGetStockLabel(wxID_SAVEAS));
-  auto* cancel_button = new wxButton(this, kIdClose, wxGetStockLabel(wxID_CLOSE));
+  auto* save_button = new wxButton(this, wxID_SAVE, wxGetStockLabel(wxID_SAVE, wxSTOCK_FOR_BUTTON));
+  auto* save_as_button = new wxButton(this, wxID_SAVEAS, wxGetStockLabel(wxID_SAVEAS, wxSTOCK_FOR_BUTTON));
+  auto* cancel_button = new wxButton(this, wxID_CLOSE, wxGetStockLabel(wxID_CLOSE, wxSTOCK_FOR_BUTTON));
 
   auto* system_sizer = new wxBoxSizer(wxHORIZONTAL);
   system_sizer->Add(save_button, 0, wxALIGN_LEFT | wxALL, 10);
@@ -146,17 +155,347 @@ void ChildFrame::Update() {
   wxWindow::Update();
 }
 void ChildFrame::OnPageChange(wxBookCtrlEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
   const auto old_page = event.GetOldSelection();
   const auto page = event.GetSelection();
-  if (notebook_ != nullptr) {
-    if (old_page != wxNOT_FOUND) {
-      notebook_->SetPageImage(old_page, old_page + 4);
-    }
-    if (page != wxNOT_FOUND) {
-      notebook_->SetPageImage(page, page);
-    }
+  auto* window = notebook_->GetPage(page);
+  if (old_page != wxNOT_FOUND) {
+    notebook_->SetPageImage(old_page, old_page + 4);
   }
+  if (page != wxNOT_FOUND) {
+    notebook_->SetPageImage(page, page);
+  }
+  if (page != kCommonPanel && window != nullptr) {
+    window->Update();
+  }
+
 }
+
+void ChildFrame::OnUpdateTable(wxUpdateUIEvent &event) {
+  event.Enable(notebook_ != nullptr && notebook_->GetSelection() == kTablePanel);
+}
+
+void ChildFrame::OnUpdateTableSelected(wxUpdateUIEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr || notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  if (notebook_->GetSelection() != kTablePanel) {
+    event.Enable(false);
+    return;
+  }
+
+  auto* table_panel = dynamic_cast<TablePanel*>(notebook_->GetCurrentPage());
+  if (table_panel == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  table_panel->OnUpdateTableSelected(event);
+}
+
+void ChildFrame::OnAddTable(wxCommandEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr) {
+    return;
+  }
+  auto& model = doc->GetModel();
+  ITable empty;
+  auto* selected = doc->GetSelectedTable();
+  if (selected != nullptr) {
+    empty.ParentId(selected->ApplicationId());
+    empty.BaseId(selected->BaseId());
+  }
+  empty.ApplicationId(model.FindNextTableId(empty.ParentId()));
+
+  TableDialog dialog(this, model, &empty);
+  const auto ret = dialog.ShowModal();
+  if (ret != wxID_OK) {
+    return;
+  }
+
+  model.AddTable(dialog.GetTable());
+  Update();
+}
+
+void ChildFrame::OnEditTable(wxCommandEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr) {
+    return;
+  }
+  auto* selected = doc->GetSelectedTable();
+  if (selected == nullptr) {
+    return;
+  }
+
+  TableDialog dialog(this, doc->GetModel(), selected);
+  const auto ret = dialog.ShowModal();
+  if (ret != wxID_OK) {
+    return;
+  }
+  *selected = dialog.GetTable();
+  Update();
+}
+
+void ChildFrame::OnDeleteTable(wxCommandEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr) {
+    return;
+  }
+  const auto* selected = doc->GetSelectedTable();
+  if (selected == nullptr) {
+    return;
+  }
+  std::ostringstream ask;
+  ask << "Do you want to delete the table?" << std::endl
+      << "Table Name: " << selected->ApplicationName();
+  int ret = wxMessageBox(ask.str(), "Delete Table Dialog",
+                         wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION,
+                         this);
+
+  if (ret != wxYES) {
+    return;
+  }
+  auto& model = doc->GetModel();
+  model.DeleteTable(selected->ApplicationId());
+  Update();
+}
+
+OdsDocument *ChildFrame::GetDoc() const {
+  return wxDynamicCast(GetDocument(), OdsDocument); //NOLINT
+}
+
+void ChildFrame::OnUpdateColumnSelected(wxUpdateUIEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr || notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  const ITable* table = doc->GetSelectedTable();
+  if (notebook_->GetSelection() != kTablePanel || table == nullptr) {
+    event.Enable(false);
+    return;
+  }
+
+  auto* table_panel = dynamic_cast<TablePanel*>(notebook_->GetCurrentPage());
+  if (table_panel == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  return table_panel->OnUpdateColumnSelected(event);
+}
+
+void ChildFrame::OnUpdateSingleColumnSelected(wxUpdateUIEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr || notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  const ITable* table = doc->GetSelectedTable();
+  if (notebook_->GetSelection() != kTablePanel || table == nullptr) {
+    event.Enable(false);
+    return;
+  }
+
+  auto* table_panel = dynamic_cast<TablePanel*>(notebook_->GetCurrentPage());
+  if (table_panel == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  return table_panel->OnUpdateSingleColumnSelected(event);
+}
+
+void ChildFrame::OnAddColumn(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* table_panel = dynamic_cast<TablePanel*>(notebook_->GetCurrentPage());
+  if (table_panel == nullptr) {
+    return;
+  }
+  return table_panel->OnAddColumn(event);
+}
+
+void ChildFrame::OnEditColumn(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* table_panel = dynamic_cast<TablePanel*>(notebook_->GetCurrentPage());
+  if (table_panel == nullptr) {
+    return;
+  }
+  return table_panel->OnEditColumn(event);
+}
+void ChildFrame::OnDeleteColumn(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* table_panel = dynamic_cast<TablePanel*>(notebook_->GetCurrentPage());
+  if (table_panel == nullptr) {
+    return;
+  }
+  return table_panel->OnDeleteColumn(event);
+}
+
+void ChildFrame::OnUpdateEnum(wxUpdateUIEvent &event) {
+  if (notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  event.Enable(notebook_->GetSelection() == kEnumPanel);
+}
+
+void ChildFrame::OnUpdateSingleEnumSelected(wxUpdateUIEvent &event) {
+  if (notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  if (notebook_->GetSelection() != kEnumPanel) {
+    event.Enable(false);
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  return enum_panel->OnUpdateSingleEnumSelected(event);
+}
+
+void ChildFrame::OnUpdateEnumSelected(wxUpdateUIEvent &event) {
+  if (notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  if (notebook_->GetSelection() != kEnumPanel) {
+    event.Enable(false);
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  return enum_panel->OnUpdateEnumSelected(event);
+}
+
+void ChildFrame::OnAddEnum(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    return;
+  }
+  return enum_panel->OnAddEnum(event);
+}
+
+void ChildFrame::OnEditEnum(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    return;
+  }
+  return enum_panel->OnEditEnum(event);
+}
+
+void ChildFrame::OnDeleteEnum(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    return;
+  }
+  return enum_panel->OnDeleteEnum(event);
+}
+
+void ChildFrame::OnUpdateSingleEnumItemSelected(wxUpdateUIEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr || notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  if (notebook_->GetSelection() != kEnumPanel) {
+    event.Enable(false);
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  return enum_panel->OnUpdateSingleEnumItemSelected(event);
+}
+
+void ChildFrame::OnUpdateEnumItemSelected(wxUpdateUIEvent &event) {
+  auto* doc = GetDoc();
+  if (doc == nullptr || notebook_ == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  if (notebook_->GetSelection() != kEnumPanel) {
+    event.Enable(false);
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    event.Enable(false);
+    return;
+  }
+  return enum_panel->OnUpdateEnumItemSelected(event);
+}
+
+void ChildFrame::OnAddEnumItem(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    return;
+  }
+  return enum_panel->OnAddEnumItem(event);
+}
+
+void ChildFrame::OnEditEnumItem(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    return;
+  }
+  return enum_panel->OnEditEnumItem(event);
+}
+
+void ChildFrame::OnDeleteEnumItem(wxCommandEvent &event) {
+  if (notebook_ == nullptr) {
+    return;
+  }
+
+  auto* enum_panel = dynamic_cast<EnumPanel*>(notebook_->GetCurrentPage());
+  if (enum_panel == nullptr) {
+    return;
+  }
+  return enum_panel->OnDeleteEnumItem(event);
+}
+
 
 } // end namespace
 

@@ -23,7 +23,7 @@ class IEnum {
     enum_id_ = enum_id;
   }
 
-  [[nodiscard]] std::string EnumName() const {
+  [[nodiscard]] const std::string& EnumName() const {
     return enum_name_;
   }
   void EnumName(const std::string& name) {
@@ -36,14 +36,15 @@ class IEnum {
   void Locked(bool locked) {
     locked_ = locked;
   }
-  void AddItem(int64_t index, const std::string &item) {
-    item_list_.insert({index, item});
-  }
 
-  void AddItem(const std::string &item);
+  void AddItem(int64_t index, const std::string &item);
+  void DeleteItem(int64_t index);
 
   [[nodiscard]] const ItemList& Items() const {
     return item_list_;
+  }
+  [[nodiscard]] int64_t GetNextKey() const {
+    return item_list_.empty() ? 0 : item_list_.crbegin()->first + 1;
   }
 
  private:

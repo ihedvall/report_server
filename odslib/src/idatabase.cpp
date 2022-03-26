@@ -2,8 +2,9 @@
  * Copyright 2021 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
-#include "ods/idatabase.h"
 #include "sqlite3.h"
+#include "ods/idatabase.h"
+
 namespace ods {
 
 bool IsSqlReservedWord(const std::string &word) {

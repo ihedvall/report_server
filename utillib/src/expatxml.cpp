@@ -61,7 +61,7 @@ class ExpatParser final {
 namespace util::xml::detail {
 
 void ExpatXml::StartElement(const XML_Char *fullname, const XML_Char **attributes) {
-  std::unique_ptr<XmlNode> p(new XmlNode(fullname));
+  std::unique_ptr<XmlNode> p = std::make_unique<XmlNode>(fullname);
   p->SetAttribute(attributes);
   auto *current = node_stack_.empty() ? nullptr : node_stack_.top();
   node_stack_.push(p.get());
@@ -150,6 +150,7 @@ void ExpatXml::Reset() {
   IXmlFile::Reset();
   node_stack_ = {};
 }
+
 
 } // end namespace util::xml::detail
 

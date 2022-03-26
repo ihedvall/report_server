@@ -8,9 +8,7 @@
 
 namespace util::xml::detail {
 
-void XmlNode::AddNode(std::unique_ptr<XmlNode> p) {
-  node_list_.push_back(std::move(p));
-}
+
 
 void XmlNode::AppendData(const char *buffer, int len) {
   if (buffer == nullptr || len <= 0) {
@@ -47,24 +45,5 @@ void XmlNode::SetAttribute(const XML_Char **attribute_list) {
   }
 }
 
-const IXmlNode *XmlNode::GetNode(const std::string &tag) const {
-  for (const auto &p: node_list_) {
-    if (!p) {
-      continue;
-    }
-    if (p->IsTagName(tag)) {
-      return p.get();
-    }
-  }
-  return nullptr;
-}
 
-void XmlNode::GetChildList(IXmlNode::ChildList &child_list) const {
-  for (const auto &p: node_list_) {
-    if (!p) {
-      continue;
-    }
-    child_list.push_back(p.get());
-  }
-}
 }
