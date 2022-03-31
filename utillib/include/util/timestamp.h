@@ -207,4 +207,14 @@ uint64_t CanOpenTimeArrayToNs(const std::vector<uint8_t> &buffer);
  * @return
  */
 int64_t TimeZoneOffset();
+
+/** \brief Converts an ODS date and time string to nanoseconds since 1970.
+ *
+ * Converts an ODS date and time string to nanoseconds since 1970. The ODS
+ * DT_DATE string have the format 'YYYYMMDDhhmmsslllcccnnn'.
+ * @param ods_date ODS date string
+ * @return Nanoseconds since 1970
+ */
+uint64_t OdsDateToNs(const std::string& ods_date);
+
 }

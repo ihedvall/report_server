@@ -6,6 +6,7 @@
 #include <cmath>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include "util/stringutil.h"
 
 
@@ -154,6 +155,14 @@ bool WildcardMatch(const std::string& text, const std::string& wildcard, bool ig
     ++wild_ptr;
   }
   return *wild_ptr == '\0';
+}
+
+std::string FloatToString(float value) {
+  return boost::lexical_cast<std::string>(value);
+}
+
+std::string DoubleToString(double value) {
+  return boost::lexical_cast<std::string>(value);
 }
 }
 

@@ -3,9 +3,26 @@
  * SPDX-License-Identifier: MIT
  */
 #include <algorithm>
-#include "ods/itable.h"
 #include "util/stringutil.h"
+#include "ods/itable.h"
+#include "ods/baseattribute.h"
 namespace ods {
+
+IColumn CreateDefaultColumn(BaseId base_id, const std::string &base_name) {
+  IColumn column;
+  if (!base_name.empty()) {
+    const auto base_list = GetBaseAttributeList(base_id);
+    const auto itr = std::ranges::find_if(base_list, [&] (const auto& base) {
+      return util::string::IEquals(base.BaseName(), base_name);
+    });
+    if (itr != base_list.cend()) {
+      const IColumn& temp = *itr;
+      column = temp;
+    }
+    column.BaseName(base_name);
+  }
+  return column;
+}
 
 void ods::ITable::AddColumn(const IColumn& column) {
   column_list_.push_back(column);

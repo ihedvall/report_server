@@ -7,7 +7,7 @@ project(TestOds
         LANGUAGES CXX)
 
 add_executable(test_ods
-        testsqlite.h testsqlite.cpp testidatabase.cpp testodsdef.cpp)
+        testsqlite.h testsqlite.cpp testidatabase.cpp testodsdef.cpp testodsitem.cpp)
 
 target_include_directories(test_ods PRIVATE
         ../include

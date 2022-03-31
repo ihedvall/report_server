@@ -14,6 +14,7 @@
 #include "tabledialog.h"
 #include "odsconfigid.h"
 #include "databasenamevalidator.h"
+#include "appnamevalidator.h"
 namespace {
 
 wxArrayString MakeBaseList() {
@@ -47,26 +48,24 @@ wxArrayString MakeTableList(const ods::IModel& model) {
 
 namespace ods::gui {
 
-wxBEGIN_EVENT_TABLE(TableDialog, wxDialog)
+wxBEGIN_EVENT_TABLE(TableDialog, wxDialog) //NOLINT
 EVT_LIST_ITEM_ACTIVATED(kIdBaseList, TableDialog::OnToggleSelect)
 EVT_CHOICE(kIdBaseType, TableDialog::OnBaseChange)
 EVT_CHOICE(kIdParentTable, TableDialog::OnParentChange)
 wxEND_EVENT_TABLE()
 
-TableDialog::TableDialog(wxWindow *parent, const IModel& model, const ITable *original)
+TableDialog::TableDialog(wxWindow *parent, const IModel& model, const ITable& original)
 : wxDialog(parent, wxID_ANY, L"Table Dialog", wxDefaultPosition, wxDefaultSize,
            wxDEFAULT_DIALOG_STYLE),
   model_(model),
+  table_(original),
   image_list_(16, 16, false, 2) {
   image_list_.Add(wxBitmap("BASE_LIST", wxBITMAP_TYPE_BMP_RESOURCE));
-  if (original != nullptr) {
-    original_ = *original;
-  }
-  table_ = original_;
+  const bool lock_id = table_.ApplicationId() > 0;
   if (table_.ApplicationId() == 0) {
     table_.ApplicationId(model_.FindNextTableId(table_.ParentId()));
   }
-  const bool lock_id = original_.ApplicationId() > 0;
+
   wxIntegerValidator app_id_validator(&application_id_);
   app_id_validator.SetMin(1);
   auto* app_id = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize,
@@ -74,7 +73,7 @@ TableDialog::TableDialog(wxWindow *parent, const IModel& model, const ITable *or
   app_id->SetMinSize({5*10,-1});
 
   auto* app_name = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
-                                     wxTextValidator(wxFILTER_EMPTY, &application_name_));
+                                     AppNameValidator(&application_name_));
   app_name->SetMinSize({20*10, -1});
 
   auto* app_desc = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,

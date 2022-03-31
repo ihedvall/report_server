@@ -120,10 +120,10 @@ class IColumn {
     enum_name_ = name;
   }
 
-  [[nodiscard]] size_t NofDecimals() const {
+  [[nodiscard]] int NofDecimals() const {
     return nof_decimals_;
   }
-  void NofDecimals(size_t decimals) {
+  void NofDecimals(int decimals) {
     nof_decimals_ = decimals;
   }
 
@@ -206,7 +206,7 @@ class IColumn {
   ods::DataType data_type_ = ods::DataType::DtUnknown; ///< Data type of the column
   size_t data_length_ = 0;  ///< Normally set to 0. Optionally used by GUI to limit the string length.
   uint16_t flags_ = 0;      ///< Various database flags
-  size_t nof_decimals_ = 0; ///< Number of floating decimals. Optional information.
+  int nof_decimals_ = -1;   ///< Number of floating decimals. Optional information.
 
   std::string application_name_; ///< Model name of the column.
   std::string base_name_;        ///< Base name if the column is defined in the ODS specification.

@@ -83,6 +83,7 @@ bool OdsConfig::OnInit() {
   new wxDocTemplate(doc_manager, "ODS Configuration Files","*.xml","",
                                          "xml","OdsConfig","ODS Configurator",
                                          wxCLASSINFO(OdsDocument), wxCLASSINFO(OdsView));
+
   auto* frame = new MainFrame(GetAppDisplayName(), start_pos, start_size, maximized);
 
   frame->Show(true);

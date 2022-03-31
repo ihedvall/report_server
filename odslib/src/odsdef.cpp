@@ -5,7 +5,9 @@
 #include <algorithm>
 #include <string_view>
 #include <array>
+#include <vector>
 #include "ods/odsdef.h"
+#include "ods/baseattribute.h"
 #include "util/stringutil.h"
 
 using namespace util::string;
@@ -47,7 +49,7 @@ constexpr std::array<BaseIdDef,31> kBaseIdList = {
     BaseIdDef{46, "AoNameMap", "NameMap"},
     BaseIdDef{47, "AoAttributeMap", "AttributeMap"},
     BaseIdDef{48, "AoFile", "File"},
-    BaseIdDef{49, "AoView", "View"},
+    BaseIdDef{49, "AoMimetypeMap", "MimetypeMap"},
     BaseIdDef{255, "AoNotDefined", "NotDefined"},
 };
 
@@ -99,7 +101,7 @@ struct TypeSpecDef {
   const std::string_view TypeName;
 };
 
-constexpr std::array<TypeSpecDef, 33>  kTypeSpecList = {
+constexpr std::array<TypeSpecDef, 34>  kTypeSpecList = {
     TypeSpecDef{0, "dt_boolean"},
     TypeSpecDef{1, "dt_byte"},
     TypeSpecDef{2, "dt_short"},
@@ -133,13 +135,14 @@ constexpr std::array<TypeSpecDef, 33>  kTypeSpecList = {
     TypeSpecDef{30, "dt_bit_uint_beo"},
     TypeSpecDef {31, "dt_bit_ieeefloat"},
     TypeSpecDef{32, "dt_bit_ieeefloat_beo"},
+    TypeSpecDef{33, "dt_bytestr_leo"},
 };
 
 struct SeqDef {
   const int Type;
   const std::string_view TypeName;
 };
-constexpr std::array<SeqDef,12> kSequenceList = {
+constexpr std::array<SeqDef,14> kSequenceList = {
     SeqDef{0, "explicit"},
     SeqDef{1, "implicit_constant"},
     SeqDef{2, "implicit_linear"},
@@ -152,6 +155,8 @@ constexpr std::array<SeqDef,12> kSequenceList = {
     SeqDef{9,"raw_polynomial_external"},
     SeqDef{10, "raw_linear_calibrated"},
     SeqDef{11, "raw_linear_calibrated_external"},
+    SeqDef{12, "raw_rational"},
+    SeqDef{13, "raw_rational_external"},
 };
 
 } // end namespace
@@ -259,5 +264,7 @@ IEnum CreateDefaultEnum(const std::string &enum_name) {
   }
   return enumerate;
 }
+
+
 }
 

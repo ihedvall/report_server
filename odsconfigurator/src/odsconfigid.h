@@ -43,4 +43,5 @@ constexpr wxWindowID kIdColumnUp = 40;
 constexpr wxWindowID kIdColumnDown = 41;
 constexpr wxWindowID kIdCopyEnum = 42;
 constexpr wxWindowID kIdPasteEnum = 43;
+constexpr wxWindowID kIdImportFile = 44;
 }

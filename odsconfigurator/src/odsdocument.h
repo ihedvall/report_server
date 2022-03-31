@@ -15,9 +15,15 @@ class OdsDocument : public wxDocument {
   OdsDocument();
   ~OdsDocument() override = default;
 
-  IModel& GetModel() {
+  [[nodiscard]] IModel& GetModel() {
     return model_;
   }
+
+  void SetModel(const IModel& model) {
+    model_ = model;
+    original_ = model;
+  }
+
   ITable* GetSelectedTable();
 
   void UpdateModified();

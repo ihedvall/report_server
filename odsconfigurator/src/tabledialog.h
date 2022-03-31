@@ -12,14 +12,13 @@ namespace ods::gui {
 
 class TableDialog : public wxDialog {
  public:
-  TableDialog(wxWindow* parent, const IModel& model, const ITable* original );
+  TableDialog(wxWindow* parent, const IModel& model, const ITable& original );
   [[nodiscard]] const ITable& GetTable() const {
     return table_;
   }
   bool TransferDataToWindow() override;
   bool TransferDataFromWindow() override;
  private:
-  ITable original_; ///< The original table
   ITable table_; ///< The modified table
   const IModel& model_; ///< Reference to the model
   wxListView* base_list_ = nullptr;

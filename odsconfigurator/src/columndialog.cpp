@@ -8,6 +8,7 @@
 #include <wx/valnum.h>
 #include "columndialog.h"
 #include "databasenamevalidator.h"
+#include "appnamevalidator.h"
 #include "odsconfigid.h"
 #include "enumdialog.h"
 namespace {
@@ -64,11 +65,10 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
     : wxDialog(parent, wxID_ANY, original.ApplicationName().empty() ? L"New Column Dialog" :  L"Edit Column Dialog" ,
                wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE),
       model_(model),
-      original_(original),
       column_(original) {
 
   auto* app_name = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
-                                  wxTextValidator(wxFILTER_EMPTY, &application_name_));
+                                  AppNameValidator(&application_name_));
   app_name->SetMinSize({20*10, -1});
 
   auto* db_name = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
@@ -109,6 +109,14 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
                                 wxTE_LEFT , length_validator);
   length->SetMinSize({5*10,-1});
 
+  wxIntegerValidator nof_decimals_validator(&nof_decimals_);
+  nof_decimals_validator.SetMin(-1);
+  nof_decimals_validator.SetMax(20);
+
+  auto* nof_dec = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize,
+                                wxTE_LEFT , nof_decimals_validator);
+  nof_dec->SetMinSize({5*10,-1});
+
   auto* unit = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
                                      wxTextValidator(wxFILTER_NONE, &unit_));
   unit->SetMinSize({10*10, -1});
@@ -141,6 +149,7 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
   auto* data_type_label = new wxStaticText(this, wxID_ANY, L"Data Type:");
   auto* enum_label = new wxStaticText(this, wxID_ANY, L"Enumerate Name:");
   auto* length_label = new wxStaticText(this, wxID_ANY, L"Data Length:");
+  auto* nof_dec_label = new wxStaticText(this, wxID_ANY, L"Number of Decimals:");
   auto* unit_label = new wxStaticText(this, wxID_ANY, L"Unit:");
   auto* default_label = new wxStaticText(this, wxID_ANY, L"Default Value:");
 
@@ -155,6 +164,7 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
   label_width = std::max(label_width,data_type_label->GetBestSize().GetX());
   label_width = std::max(label_width,enum_label->GetBestSize().GetX());
   label_width = std::max(label_width,length_label->GetBestSize().GetX());
+  label_width = std::max(label_width,nof_dec_label->GetBestSize().GetX());
   label_width = std::max(label_width,unit_label->GetBestSize().GetX());
   label_width = std::max(label_width,default_label->GetBestSize().GetX());
 
@@ -168,6 +178,7 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
   data_type_label->SetMinSize({label_width, -1});
   enum_label->SetMinSize({label_width, -1});
   length_label->SetMinSize({label_width, -1});
+  nof_dec_label->SetMinSize({label_width, -1});
   unit_label->SetMinSize({label_width, -1});
   default_label->SetMinSize({label_width, -1});
 
@@ -211,6 +222,10 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
   length_sizer->Add(length_label, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 5);
   length_sizer->Add(length, 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, 5);
 
+  auto* nof_dec_sizer = new wxBoxSizer(wxHORIZONTAL);
+  nof_dec_sizer->Add(nof_dec_label, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 5);
+  nof_dec_sizer->Add(nof_dec, 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, 5);
+
   auto* unit_sizer = new wxBoxSizer(wxHORIZONTAL);
   unit_sizer->Add(unit_label, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 5);
   unit_sizer->Add(unit, 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, 5);
@@ -235,6 +250,7 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
   type_box->Add(data_type_sizer, 0, wxALIGN_LEFT | wxALL,  1);
   type_box->Add(enum_sizer, 0, wxALIGN_LEFT | wxALL,  1);
   type_box->Add(length_sizer, 0, wxALIGN_LEFT | wxALL,  1);
+  type_box->Add(nof_dec_sizer, 0, wxALIGN_LEFT | wxALL,  1);
   type_box->Add(unit_sizer, 0, wxALIGN_LEFT | wxALL,  1);
   type_box->Add(default_sizer, 0, wxALIGN_LEFT | wxALL,  1);
 
@@ -274,6 +290,7 @@ bool ColumnDialog::TransferDataToWindow() {
   data_type_ = DataTypeToUserText(column_.DataType());
   enum_name_ = wxString::FromUTF8(column_.EnumName());
   length_ = column_.DataLength();
+  nof_decimals_ = column_.NofDecimals();
   unit_ = wxString::FromUTF8(column_.Unit());
   default_value_ = wxString::FromUTF8(column_.DefaultValue());
 
@@ -321,6 +338,7 @@ bool ColumnDialog::TransferDataFromWindow() {
   column_.DataType(TextToDataType(data_type_.ToStdString()));
   column_.EnumName(enum_name_.utf8_string());
   column_.DataLength(length_);
+  column_.NofDecimals(nof_decimals_);
   column_.Unit(unit_.utf8_string());
   column_.DefaultValue(default_value_.utf8_string());
   column_.Auto(auto_);

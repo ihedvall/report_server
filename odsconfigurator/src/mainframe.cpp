@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Ingemar Hedvall
+ * Copyright 2022 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
 #include <string>
@@ -8,11 +8,18 @@
 #include <wx/config.h>
 #include <wx/aboutdlg.h>
 
+#include <util/logstream.h>
+#include <ods/atfxfile.h>
+
 #include "mainframe.h"
 #include "odsconfigid.h"
+#include "odsdocument.h"
+
+using namespace util::log;
+
 namespace ods::gui {
 
-wxBEGIN_EVENT_TABLE(MainFrame, wxDocMDIParentFrame)
+wxBEGIN_EVENT_TABLE(MainFrame, wxDocMDIParentFrame) // NOLINT
   EVT_MENU(wxID_ABOUT, MainFrame::OnAbout)
   EVT_CLOSE(MainFrame::OnClose)
   EVT_UPDATE_UI(wxID_SAVE, MainFrame::OnUpdateNoDoc)
@@ -34,6 +41,8 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxDocMDIParentFrame)
   EVT_UPDATE_UI(kIdAddEnumItem, MainFrame::OnUpdateNoDoc)
   EVT_UPDATE_UI(kIdEditEnumItem, MainFrame::OnUpdateNoDoc)
   EVT_UPDATE_UI(kIdDeleteEnumItem, MainFrame::OnUpdateNoDoc)
+
+  EVT_MENU(kIdImportFile, MainFrame::OnImport)
 wxEND_EVENT_TABLE()
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSize& start_size, bool maximized)
@@ -55,6 +64,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
   menu_file->Append(wxID_SAVE);
   menu_file->Append(wxID_SAVEAS);
   menu_file->Append(wxID_CLOSE);
+  menu_file->AppendSeparator();
+  menu_file->Append(kIdImportFile, "Import File");
   menu_file->AppendSeparator();
   menu_file->Append(wxID_EXIT);
 
@@ -157,7 +168,7 @@ void MainFrame::OnAbout(wxCommandEvent&) {
 }
 
 
-void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) {
+void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) { //NOLINT
   auto* man = wxDocManager::GetDocumentManager();
   auto* doc = man != nullptr ? man->GetCurrentDocument() : nullptr;
   if (doc == nullptr) {
@@ -166,6 +177,57 @@ void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) {
   } else {
     event.Skip(true);
   }
+}
+
+void MainFrame::OnImport(wxCommandEvent &event) {
+
+  wxFileDialog dialog(this, "Select ATFX File", "", "",
+                     "ATFX files (*.atfx)|*.atfx|All files (*.*)|*.*",
+                     wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+  const auto ret = dialog.ShowModal();
+  if (ret != wxID_OK) {
+    return;
+  }
+
+  const auto filename = dialog.GetPath().ToStdString();
+  AtfxFile atfx_file;
+  atfx_file.FileName(filename);
+  const auto import = atfx_file.Import();
+  if (!import) {
+    std::ostringstream err;
+    err << "Import of the file failed!" << std::endl;
+    err << "More information in the log file." << std::endl;
+    err << "File: " << filename;
+    wxMessageBox(err.str(), L"ATFX File error", wxOK | wxCENTRE | wxICON_ERROR,this);
+    return;
+  }
+  auto* doc_manager = wxDocManager::GetDocumentManager();
+  if (doc_manager == nullptr) {
+    LOG_ERROR() << "Failed to get the document manager.";
+    return;
+  }
+  auto* doc = doc_manager->CreateNewDocument();
+  if (doc == nullptr) {
+    LOG_ERROR() << "Failed to create a new document.";
+    return;
+  }
+  wxString title;
+  try {
+    const std::filesystem::path full_path(filename);
+    const auto stem = full_path.stem();
+    title = stem.wstring();
+  } catch (const std::exception& error) {
+    LOG_ERROR() << "Invalid path. Error: " << error.what() << ", File: " << filename;
+  }
+  auto* ods_doc = wxDynamicCast(doc, OdsDocument); // NOLINT
+  if (ods_doc == nullptr) {
+    LOG_ERROR() << "Failed to convert the document.";
+    return;
+  }
+  ods_doc->SetTitle(title);
+  ods_doc->SetModel(atfx_file.Model());
+  ods_doc->UpdateAllViews();
+
 }
 
 }

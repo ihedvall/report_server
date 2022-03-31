@@ -17,7 +17,6 @@ namespace {
 constexpr int kCommonPanel = 0;
 constexpr int kTablePanel = 1;
 constexpr int kEnumPanel = 2;
-constexpr int kRelationPanel = 3;
 
 } // Empty namespace
 
@@ -82,7 +81,6 @@ ChildFrame::ChildFrame(wxDocument *doc,
   notebook_->AddPage(common, L"General", false,4);
   notebook_->AddPage(config, L"Database Design", false,5);
   notebook_->AddPage(enumerate, L"Enumerations", false,6);
-  //notebook_->AddPage(relation, L"M:N Relations", false,7);
 
   auto* save_button = new wxButton(this, wxID_SAVE, wxGetStockLabel(wxID_SAVE, wxSTOCK_FOR_BUTTON));
   auto* save_as_button = new wxButton(this, wxID_SAVEAS, wxGetStockLabel(wxID_SAVEAS, wxSTOCK_FOR_BUTTON));
@@ -146,6 +144,10 @@ void ChildFrame::OnCloseDoc(wxCommandEvent& event) {
   }
 }
 void ChildFrame::Update() {
+  auto *doc = GetDocument();
+  if (doc != nullptr) {
+    SetTitle(doc->GetTitle());
+  }
   for (size_t tab = 0; tab < notebook_->GetPageCount(); ++tab) {
     auto* page = notebook_->GetPage(tab);
     if (page != nullptr) {
@@ -154,6 +156,7 @@ void ChildFrame::Update() {
   }
   wxWindow::Update();
 }
+
 void ChildFrame::OnPageChange(wxBookCtrlEvent &event) {
   if (notebook_ == nullptr) {
     return;
@@ -210,7 +213,7 @@ void ChildFrame::OnAddTable(wxCommandEvent &event) {
   }
   empty.ApplicationId(model.FindNextTableId(empty.ParentId()));
 
-  TableDialog dialog(this, model, &empty);
+  TableDialog dialog(this, model, empty);
   const auto ret = dialog.ShowModal();
   if (ret != wxID_OK) {
     return;
@@ -230,7 +233,7 @@ void ChildFrame::OnEditTable(wxCommandEvent &event) {
     return;
   }
 
-  TableDialog dialog(this, doc->GetModel(), selected);
+  TableDialog dialog(this, doc->GetModel(), *selected);
   const auto ret = dialog.ShowModal();
   if (ret != wxID_OK) {
     return;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Ingemar Hedvall
+ * Copyright 2022 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
 #pragma once
@@ -15,6 +15,7 @@ class MainFrame : public wxDocMDIParentFrame {
   void OnClose(wxCloseEvent& event);
   void OnAbout(wxCommandEvent& event);
   void OnUpdateNoDoc(wxUpdateUIEvent &event);
+  void OnImport(wxCommandEvent& event);
  wxDECLARE_EVENT_TABLE();
 };
 }

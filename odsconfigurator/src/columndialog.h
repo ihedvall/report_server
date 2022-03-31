@@ -18,7 +18,6 @@ class ColumnDialog : public wxDialog {
   bool TransferDataToWindow() override;
   bool TransferDataFromWindow() override;
  private:
-  IColumn original_;
   IColumn column_;
   IModel& model_; ///< Reference to the model
 
@@ -37,6 +36,7 @@ class ColumnDialog : public wxDialog {
   wxString data_type_;
   wxString enum_name_;
   uint16_t length_ = 0;
+  int      nof_decimals_ = -1;
   wxString unit_;
   wxString default_value_;
 

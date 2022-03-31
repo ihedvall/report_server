@@ -38,7 +38,7 @@ enum class BaseId : int {
   AoNameMap             = 46,
   AoAttributeMap        = 47,
   AoFile                = 48,
-  AoView                = 49,
+  AoMimetypeMap                = 49,
   AoNotDefined          = 255
 };
 
@@ -108,4 +108,6 @@ constexpr uint16_t kCaseSensitive = 0x08;
 constexpr uint16_t kIndex = 0x80;
 
 IEnum CreateDefaultEnum(const std::string& enum_name);
+
+
 } // end namespace

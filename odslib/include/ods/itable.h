@@ -12,6 +12,8 @@
 
 namespace ods {
 
+IColumn CreateDefaultColumn(BaseId base_id, const std::string& base_name);
+
 class ITable {
  public:
 

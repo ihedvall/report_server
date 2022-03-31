@@ -11,7 +11,7 @@
 
 namespace ods::gui {
 
-wxBEGIN_EVENT_TABLE(CommonPanel, wxPanel)
+wxBEGIN_EVENT_TABLE(CommonPanel, wxPanel) // NOLINT
         EVT_TIMER(kIdSaveTimer, CommonPanel::OnSaveTimer)
 wxEND_EVENT_TABLE()
 
@@ -24,7 +24,7 @@ CommonPanel::CommonPanel(wxWindow *parent)
 
   auto* desc = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
                               wxTextValidator(wxFILTER_NONE, &description_));
-  desc->SetMinSize({40*10, -1});
+  desc->SetMinSize({60*10, -1});
 
   auto* version = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
                               wxTextValidator(wxFILTER_NONE, &version_));
@@ -58,7 +58,7 @@ CommonPanel::CommonPanel(wxWindow *parent)
 
   auto* source_info = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize,
                                      wxTE_LEFT, wxTextValidator(wxFILTER_NONE, &source_info_));
-  source_info->SetMinSize({20*10, -1});
+  source_info->SetMinSize({60*10, -1});
 
   auto* name_label = new wxStaticText(this, wxID_ANY, L"Name:");
   auto* desc_label = new wxStaticText(this, wxID_ANY, L"Description:");
@@ -233,7 +233,7 @@ void CommonPanel::Update() {
 }
 
 void CommonPanel::OnSaveTimer(wxTimerEvent& event) {
-  if (event.GetId() != kIdSaveTimer) {
+  if (event.GetId() != kIdSaveTimer || !save_timer_.IsRunning() || IsBeingDeleted()) {
     return;
   }
   TransferDataFromWindow();

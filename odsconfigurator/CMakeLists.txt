@@ -18,7 +18,7 @@ add_executable(odsconfig
         src/commonpanel.cpp src/commonpanel.h
         src/enumpanel.cpp src/enumpanel.h
         src/tablepanel.cpp src/tablepanel.h
-        src/tabledialog.cpp src/tabledialog.h src/columndialog.cpp src/columndialog.h src/databasenamevalidator.cpp src/databasenamevalidator.h src/enumdialog.cpp src/enumdialog.h src/enumitemdialog.cpp src/enumitemdialog.h)
+        src/tabledialog.cpp src/tabledialog.h src/columndialog.cpp src/columndialog.h src/databasenamevalidator.cpp src/databasenamevalidator.h src/enumdialog.cpp src/enumdialog.h src/enumitemdialog.cpp src/enumitemdialog.h src/appnamevalidator.cpp src/appnamevalidator.h)
 
 
 target_include_directories(odsconfig PRIVATE ${wxWidgets_INCLUDE_DIRS})

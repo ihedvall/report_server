@@ -375,5 +375,111 @@ std::string NsToLocalTime(uint64_t ns_since_1970, int format) {
   }
   return output.str();
 }
+uint64_t OdsDateToNs(const std::string &ods_date) {
+  if (ods_date.empty()) {
+    return 0;
+  }
+  std::vector<uint64_t> temp_list;
+  uint8_t ns_count = 0; // Counter for nof digits
+  uint64_t temp = 0; // Holder for the value
+  for (char input : ods_date) {
+    if (!std::isdigit(input)) {
+      continue;
+    }
+    temp *= 10;
+    temp += input - '0';
+    ++ns_count;
+    switch (temp_list.size()) {
+      case 0: // YYYY
+        if (ns_count >= 4) {
+          temp_list.push_back(temp);
+          temp = 0;
+          ns_count = 0;
+        }
+        break;
+
+
+      case 1: // MM
+      case 2: // DD
+      case 3: // hh
+      case 4: // mm
+      case 5: // ss
+        if (ns_count >= 2) {
+          temp_list.push_back(temp);
+          temp = 0;
+          ns_count = 0;
+        }
+        break;
+      default:
+        if (ns_count >= 3) {
+          temp_list.push_back(temp);
+          temp = 0;
+          ns_count = 0;
+        }
+        break;
+    }
+  }
+  uint64_t nano_sec = 0;
+  struct tm bt{};
+  for (size_t index = 0; index < temp_list.size(); ++index) {
+    int value = static_cast<int>(temp_list[index]);
+    switch (index) {
+      case 0:
+        if (value < 1970) {
+          value = 1970;
+        }
+        bt.tm_year = value - 1900; // Years since 1900
+        break;
+
+      case 1:
+        bt.tm_mon = value - 1; // Month 0..11
+        break;
+
+      case 2:
+        bt.tm_mday = value; // Day 1..31
+        break;
+
+      case 3:
+        bt.tm_hour = value;
+        break;
+
+      case 4:
+        bt.tm_min = value;
+        break;
+
+      case 5:
+        bt.tm_sec = value;
+        break;
+
+      case 6: { // ms
+        auto val = static_cast<uint64_t>(value);
+        val *= 1'000'000;
+        nano_sec += val;
+        break;
+      }
+
+      case 7: { // us
+        auto val = static_cast<uint64_t>(value);
+        val *= 1'000;
+        nano_sec += val;
+        break;
+      }
+
+      case 8: { // ns
+        auto val = static_cast<uint64_t>(value);
+        nano_sec += val;
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+  auto ns_1970 = static_cast<uint64_t>(_mkgmtime(&bt));
+  ns_1970 *= 1'000'000'000;
+  ns_1970 += nano_sec;
+  return ns_1970;
+
+}
 
 }

@@ -7,9 +7,10 @@
 #include "enumdialog.h"
 #include "odsconfigid.h"
 #include "enumitemdialog.h"
+#include "appnamevalidator.h"
 namespace ods::gui {
 
-wxBEGIN_EVENT_TABLE(EnumDialog, wxDialog)
+wxBEGIN_EVENT_TABLE(EnumDialog, wxDialog) // NOLINT
   EVT_CONTEXT_MENU(EnumDialog::OnRightClick)
   EVT_LIST_ITEM_ACTIVATED(kIdEnumDialogList, EnumDialog::OnItemDoubleClick)
   EVT_UPDATE_UI(kIdEnumDialogEdit,EnumDialog::OnItemSingleSelect)
@@ -26,7 +27,7 @@ EnumDialog::EnumDialog(wxWindow *parent, const IModel &model, const IEnum &enume
   original_(enumerate),
   enumerate_(enumerate) {
   enum_name_ctrl_ = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
-                                  wxTextValidator(wxFILTER_EMPTY, &enum_name_));
+                                  AppNameValidator(&enum_name_));
   enum_name_ctrl_->SetMinSize({20*10, -1});
 
   auto* locked = new wxCheckBox(this, wxID_ANY,L"Block On-Line Changes",wxDefaultPosition,wxDefaultSize, 0,

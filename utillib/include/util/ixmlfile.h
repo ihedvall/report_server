@@ -25,9 +25,7 @@ class IXmlFile {
    *
    * @param filename File name with full path
    */
-  void FileName(const std::string& filename) {
-    filename_ = filename;
-  }
+  void FileName(const std::string& filename);
 
   /** \brief Return the full path file name.
    *

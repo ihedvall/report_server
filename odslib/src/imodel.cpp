@@ -55,10 +55,11 @@ void ReadColumn(const IXmlNode& node, ods::ITable& table) {
     }
 
     if (node.ExistProperty("Decimals")) {
-      col.NofDecimals(node.Property<size_t>("Decimals"));
+      col.NofDecimals(node.Property<int>("Decimals", -1));
     } else {
-      col.NofDecimals(type->Attribute<size_t>("decimals"));
+      col.NofDecimals(type->Attribute<int>("decimals", -1));
     }
+
     if (node.ExistProperty("Length")) {
       col.DataLength(node.Property<size_t>("Length"));
     } else {
@@ -125,7 +126,7 @@ void SaveColumn(const ods::IColumn& column, IXmlNode& root) {
   if (!column.EnumName().empty()) {
     type.SetAttribute("enum", column.EnumName());
   }
-  if (data_type == ods::DataType::DtFloat || data_type == ods::DataType::DtDouble) {
+  if (column.NofDecimals() >= 0 && (data_type == ods::DataType::DtFloat || data_type == ods::DataType::DtDouble)) {
     type.SetAttribute("decimals", column.NofDecimals());
   }
   if (column.DataLength() > 0) {

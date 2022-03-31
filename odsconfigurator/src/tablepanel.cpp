@@ -44,13 +44,13 @@ int BaseIdImage(ods::BaseId base_id) {
     case ods::BaseId::AoNameMap: return 26;
     case ods::BaseId::AoAttributeMap: return 27;
     case ods::BaseId::AoFile: return 28;
-    case ods::BaseId::AoView: return 0;
+    case ods::BaseId::AoMimetypeMap: return 0;
     default:break;
   }
   return 30;
 }
 
-void AppendSubTable(wxTreeListCtrl& tree_list, wxTreeListItem& root, const ods::ITable& table) {
+void AppendSubTable(wxTreeListCtrl& tree_list, wxTreeListItem& root, const ods::ITable& table) { // NOLINT
   const auto& table_list = table.SubTables();
   // Environment table is always the root. It's OK if it is missing, so we don't show it.
   for ( const auto& itr : table_list) {
@@ -79,7 +79,7 @@ void SelectItem(wxTreeListCtrl& tree_list, const ods::IModel& model, int64_t app
 
 namespace ods::gui {
 
-wxBEGIN_EVENT_TABLE(TablePanel, wxPanel)
+wxBEGIN_EVENT_TABLE(TablePanel, wxPanel) // NOLINT
         EVT_TREELIST_SELECTION_CHANGED(kIdTableList, TablePanel::OnTableSelect)
         EVT_TREELIST_ITEM_ACTIVATED(kIdTableList, TablePanel::OnTableActivated)
         EVT_TREELIST_ITEM_CONTEXT_MENU(kIdTableList, TablePanel::OnTableRightClick)
@@ -150,7 +150,7 @@ TablePanel::TablePanel(wxWindow *parent)
 
   auto *main_sizer = new wxBoxSizer(wxHORIZONTAL);
   main_sizer->Add(splitter, 1, wxALIGN_LEFT | wxALL | wxEXPAND, 0);
-  main_sizer->Add(button_sizer, 0, wxALIGN_CENTER_VERTICAL, wxALL, 0);
+  main_sizer->Add(button_sizer, 0, wxALIGN_CENTER_VERTICAL| wxALL, 0);
   SetSizerAndFit(main_sizer);
 
   RedrawTableList();
@@ -270,7 +270,8 @@ void TablePanel::RedrawColumnList() {
       type << " '" << column.DefaultValue() << "'";
     }
 
-    if (column.DataType() == DataType::DtFloat || column.DataType() == DataType::DtDouble) {
+    if (column.NofDecimals() >= 0 &&
+       (column.DataType() == DataType::DtFloat || column.DataType() == DataType::DtDouble)) {
       type << " :" << column.NofDecimals();
     }
 
@@ -350,7 +351,7 @@ void TablePanel::OnTableActivated(wxTreeListEvent&) {
     return;
   }
 
-  TableDialog dialog(this, doc->GetModel(), selected);
+  TableDialog dialog(this, doc->GetModel(), *selected);
   const auto ret = dialog.ShowModal();
   if (ret != wxID_OK) {
     return;
@@ -681,7 +682,7 @@ void TablePanel::OnPasteTable(wxCommandEvent& event) {
     if (ret != wxYES) {
       return;
     }
-    TableDialog dialog(this, model, &copy);
+    TableDialog dialog(this, model, copy);
     const auto ret1 = dialog.ShowModal();
     if (ret1 != wxID_OK) {
       return;

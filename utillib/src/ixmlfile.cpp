@@ -113,6 +113,9 @@ void IXmlFile::WriteRoot(std::ostream &dest) {
   }
 }
 
+void IXmlFile::FileName(const std::string &filename) {
+  filename_ = filename;
+}
 
 std::unique_ptr<IXmlFile> CreateXmlFile(const std::string &type) {
   if (util::string::IEquals("FileWriter", type)) {
