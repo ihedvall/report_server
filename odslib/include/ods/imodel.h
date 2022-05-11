@@ -107,28 +107,38 @@ class IModel {
   void AddEnum(const IEnum& obj);
   void DeleteEnum(const std::string& name);
 
-  [[nodiscard ]] int64_t FindNextTableId(int64_t parent_id) const;
-
+  [[nodiscard]] int64_t FindNextEnumId() const;
   [[nodiscard]] const EnumList& Enums() const {
     return enum_list_;
   }
+  [[nodiscard]] EnumList& Enums() {
+    return enum_list_;
+  }
+  [[nodiscard ]] int64_t FindNextTableId(int64_t parent_id) const;
+
   [[nodiscard]] const TableList& Tables() const {
     return table_list_;
   }
+  void ClearTableList() {
+    table_list_.clear();
+  }
+
   [[nodiscard]] std::vector<const ITable*> AllTables() const;
 
   [[nodiscard]] const IEnum* GetEnum(const std::string& name) const;
+  [[nodiscard]] IEnum* GetEnum(const std::string& name);
 
   [[nodiscard]] const ITable* GetTable(int64_t application_id) const;
   [[nodiscard]] const ITable* GetTableByName(const std::string& name) const;
   [[nodiscard]] const ITable* GetTableByDbName(const std::string& name) const;
   [[nodiscard]] const ITable* GetBaseId(BaseId base) const;
 
+  [[nodiscard]] bool IsEmpty() const;
   [[nodiscard]] bool ReadModel(const std::string& filename);
   [[nodiscard]] bool SaveModel(const std::string& filename) const;
  private:
-  std::string name_ = "New model";
-  std::string version_ = "1.0.0";
+  std::string name_;
+  std::string version_;
   std::string description_;
 
   std::string created_by_;

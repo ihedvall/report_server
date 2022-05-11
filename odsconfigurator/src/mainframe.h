@@ -15,7 +15,10 @@ class MainFrame : public wxDocMDIParentFrame {
   void OnClose(wxCloseEvent& event);
   void OnAbout(wxCommandEvent& event);
   void OnUpdateNoDoc(wxUpdateUIEvent &event);
-  void OnImport(wxCommandEvent& event);
+  void OnUpdateAnyDoc(wxUpdateUIEvent &event);
+  void OnImportAtfx(wxCommandEvent& event);
+  void OnImportSqlite(wxCommandEvent& event);
+  void OnCreateDbSqlite(wxCommandEvent& event);
  wxDECLARE_EVENT_TABLE();
 };
 }

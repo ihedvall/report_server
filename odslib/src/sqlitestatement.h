@@ -6,7 +6,9 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "ods/icolumn.h"
 #include "sqlitedatabase.h"
+
 namespace ods::detail {
 
 class SqliteStatement final {
@@ -20,7 +22,8 @@ class SqliteStatement final {
 
   [[nodiscard]] bool IsNull(int column) const;
 
-
+  void SetValue(int index, const char* value) const;
+  void SetValue(int index, bool value) const;
   void SetValue(int index, int64_t value) const;
   void SetValue(int index, double value) const;
   void SetValue(int index, const std::string& value) const;
@@ -29,12 +32,13 @@ class SqliteStatement final {
   template<typename T>
   void GetValue(int column, T& value) const;
 
-  template<typename T = std::string>
-  void GetValue(int column, std::string& value) const;
+  template<typename T>
+  T Value(int column) const;
 
-  template<typename T = std::vector<uint8_t>>
-  void GetValue(int column, std::vector<uint8_t>& value) const;
+  template<typename T>
+  T Value(const IColumn* column) const;
 
+  [[nodiscard]] int GetColumnIndex(const std::string& column_name) const;
  private:
   sqlite3*  database_ = nullptr;
   sqlite3_stmt* statement_ = nullptr;
@@ -45,6 +49,12 @@ void SqliteStatement::GetValue(int column, T& value) const {
   if (statement_ == nullptr) {
     throw std::runtime_error("Statement is null");
   }
+
+  if (column < 0) {
+    value = {};
+    return;
+  }
+
   const auto type = sqlite3_column_type(statement_, column);
   switch (type) {
     case SQLITE_INTEGER: {
@@ -77,6 +87,31 @@ void SqliteStatement::GetValue(int column, T& value) const {
       break;
   }
 }
+
+template<typename T>
+T SqliteStatement::Value(int column) const {
+  T value = {};
+  GetValue(column, value);
+  return value;
+}
+
+template<typename T>
+T SqliteStatement::Value(const IColumn* column) const {
+  T value = {};
+  if (column != nullptr) {
+    GetValue(GetColumnIndex(column->DatabaseName()), value);
+  }
+  return value;
+}
+
+template<>
+void SqliteStatement::GetValue<bool>(int column, bool& value) const;
+
+template<>
+void SqliteStatement::GetValue<std::string>(int column, std::string& value) const;
+
+template<>
+void SqliteStatement::GetValue<std::vector<uint8_t>>(int column, std::vector<uint8_t>& value) const;
 
 } // end namespace ods::detail
 

@@ -13,14 +13,13 @@
 #include <vector>
 namespace util::crypto {
 
-/** \brief Generates an MD5 file checksum.
+/** \brief Generates an MD5 file checksum (32 character) string.
  *
  * Creates an MD5 file checksum. The output is a hexadecimal string.
  * @param [in] file Full path to the file name.
- * @param [out] md5 Returning MD5 string.
- * @return True on success.
+ * @return A 32 (hex) character string on success else an empty string.
  */
-bool CreateMd5FileString(const std::string& file, std::string& md5);
+std::string CreateMd5FileString(const std::string& file);
 
 /** \brief Create a file hash byte array according to MD5
  *

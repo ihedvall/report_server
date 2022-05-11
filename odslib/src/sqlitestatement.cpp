@@ -6,8 +6,10 @@
 #include <sstream>
 #include <iomanip>
 #include <sqlite3.h>
+#include <util/stringutil.h>
 #include "sqlitestatement.h"
 
+using namespace util::string;
 namespace ods::detail {
 
 SqliteStatement::SqliteStatement(sqlite3 *database, const std::string &sql)
@@ -54,6 +56,9 @@ bool SqliteStatement::Step() {
 }
 
 void SqliteStatement::Reset() {
+  if (statement_ == nullptr) {
+    throw std::runtime_error("Statement is null");
+  }
   const auto reset = sqlite3_reset(statement_);
   if (reset != SQLITE_OK) {
     std::ostringstream error;
@@ -62,7 +67,15 @@ void SqliteStatement::Reset() {
   }
 }
 
+void SqliteStatement::SetValue(int index, bool value) const {
+  const int64_t temp = value ? 1 : 0;
+  SetValue(index, temp);
+}
+
 void SqliteStatement::SetValue(int index, int64_t value) const {
+  if (statement_ == nullptr) {
+    throw std::runtime_error("Statement is null");
+  }
   const auto bind = sqlite3_bind_int64(statement_, index,value);
   if (bind != SQLITE_OK) {
     std::ostringstream error;
@@ -72,6 +85,9 @@ void SqliteStatement::SetValue(int index, int64_t value) const {
 }
 
 void SqliteStatement::SetValue(int index, double value) const {
+  if (statement_ == nullptr) {
+    throw std::runtime_error("Statement is null");
+  }
   const auto bind = sqlite3_bind_double(statement_, index,value);
   if (bind != SQLITE_OK) {
     std::ostringstream error;
@@ -81,6 +97,9 @@ void SqliteStatement::SetValue(int index, double value) const {
 }
 
 void SqliteStatement::SetValue(int index, const std::string &value) const {
+  if (statement_ == nullptr) {
+    throw std::runtime_error("Statement is null");
+  }
   const auto bind = value.empty() ?
     sqlite3_bind_null(statement_, index) :
     sqlite3_bind_text(statement_, index, value.c_str(),-1, SQLITE_TRANSIENT);
@@ -90,8 +109,15 @@ void SqliteStatement::SetValue(int index, const std::string &value) const {
     throw std::runtime_error(error.str());
   }
 }
+void SqliteStatement::SetValue(int index, const char *value) const {
+  const std::string temp(value == nullptr ? "" : value);
+  SetValue(index, temp);
+}
 
 void SqliteStatement::SetValue(int index, const std::vector<uint8_t> &value) const {
+  if (statement_ == nullptr) {
+    throw std::runtime_error("Statement is null");
+  }
   const auto bind = value.empty() ?
                     sqlite3_bind_null(statement_, index) :
                     sqlite3_bind_blob64(statement_, index, value.data(),
@@ -104,8 +130,34 @@ void SqliteStatement::SetValue(int index, const std::vector<uint8_t> &value) con
 }
 
 bool SqliteStatement::IsNull(int column) const {
+  if (statement_ == nullptr) {
+    throw std::runtime_error("Statement is null");
+  }
   const auto type = sqlite3_column_type(statement_, column);
   return type == SQLITE_NULL;
+}
+
+int SqliteStatement::GetColumnIndex(const std::string &column_name) const {
+  if (statement_ == nullptr || column_name.empty()) {
+    return -1;
+  }
+  const auto count = sqlite3_column_count(statement_);
+  for (int column = 0; column < count; ++column) {
+    const auto* name = sqlite3_column_name(statement_,column);
+    if (name != nullptr && IEquals(column_name, name)) {
+      return column;
+    }
+  }
+  return -1;
+}
+
+
+
+template<>
+void SqliteStatement::GetValue(int column, bool& value) const {
+  int64_t temp = 0;
+  GetValue(column, temp);
+  value = temp != 0;
 }
 
 template<>
@@ -113,8 +165,12 @@ void SqliteStatement::GetValue(int column, std::string& value) const {
   if (statement_ == nullptr) {
     throw std::runtime_error("Statement is null");
   }
-  const auto type = sqlite3_column_type(statement_, column);
+  if (column < 0) {
+    value.clear();
+    return;
+  }
 
+  const auto type = sqlite3_column_type(statement_, column);
 
   switch (type) {
     case SQLITE_INTEGER: {
@@ -174,6 +230,10 @@ template<>
 void SqliteStatement::GetValue(int column, std::vector<uint8_t>& value) const {
   if (statement_ == nullptr) {
     throw std::runtime_error("Statement is null");
+  }
+  if (column < 0) {
+    value.clear();
+    return;
   }
   const auto type = sqlite3_column_type(statement_, column);
 

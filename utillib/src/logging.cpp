@@ -4,10 +4,15 @@
  */
 #include <vector>
 #include <filesystem>
+
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
 #include <boost/process.hpp>
 #pragma GCC diagnostic pop
+#else
+#include <boost/process.hpp>
+#endif
 
 #include "util/logging.h"
 #include "util/logconfig.h"

@@ -10,10 +10,11 @@
 
 #include <util/logstream.h>
 #include <ods/atfxfile.h>
-
+#include "../../odslib/src/sqlitedatabase.h"
 #include "mainframe.h"
 #include "odsconfigid.h"
 #include "odsdocument.h"
+
 
 using namespace util::log;
 
@@ -42,7 +43,11 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxDocMDIParentFrame) // NOLINT
   EVT_UPDATE_UI(kIdEditEnumItem, MainFrame::OnUpdateNoDoc)
   EVT_UPDATE_UI(kIdDeleteEnumItem, MainFrame::OnUpdateNoDoc)
 
-  EVT_MENU(kIdImportFile, MainFrame::OnImport)
+  EVT_MENU(kIdImportFile, MainFrame::OnImportAtfx)
+  EVT_MENU(kIdImportSqlite, MainFrame::OnImportSqlite)
+
+  EVT_UPDATE_UI(kIdCreateDbSqlite, MainFrame::OnUpdateAnyDoc)
+  EVT_MENU(kIdCreateDbSqlite, MainFrame::OnCreateDbSqlite)
 wxEND_EVENT_TABLE()
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSize& start_size, bool maximized)
@@ -56,6 +61,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
   auto *app_config = wxConfig::Get();
   auto *doc_manager = wxDocManager::GetDocumentManager();
 
+  auto* menu_import = new wxMenu;
+  menu_import->Append(kIdImportFile, "ATFX File");
+  menu_import->Append(kIdImportSqlite, "SQLite Database");
+
+  auto* menu_create = new wxMenu;
+  menu_create->Append(kIdCreateDbSqlite, "SQLite Database");
+
   // FILE
   auto *menu_file = new wxMenu;
   menu_file->Append(wxID_NEW);
@@ -65,7 +77,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& start_pos, const wxSi
   menu_file->Append(wxID_SAVEAS);
   menu_file->Append(wxID_CLOSE);
   menu_file->AppendSeparator();
-  menu_file->Append(kIdImportFile, "Import File");
+  menu_file->AppendSubMenu(menu_import, "Import...");
+  menu_file->AppendSubMenu(menu_create, "Create...");
   menu_file->AppendSeparator();
   menu_file->Append(wxID_EXIT);
 
@@ -179,17 +192,24 @@ void MainFrame::OnUpdateNoDoc(wxUpdateUIEvent &event) { //NOLINT
   }
 }
 
-void MainFrame::OnImport(wxCommandEvent &event) {
+void MainFrame::OnUpdateAnyDoc(wxUpdateUIEvent &event) { //NOLINT
+  auto* man = wxDocManager::GetDocumentManager();
+  auto* doc = man != nullptr ? man->GetCurrentDocument() : nullptr;
+  event.Enable(doc != nullptr);
+}
 
-  wxFileDialog dialog(this, "Select ATFX File", "", "",
-                     "ATFX files (*.atfx)|*.atfx|All files (*.*)|*.*",
-                     wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+void MainFrame::OnImportAtfx(wxCommandEvent &event) {
+
+  wxFileDialog dialog(this, "Select ODS Source", "", "",
+                 "ATFX files (*.atfx)|*.atfx|All files (*.*)|*.*",
+                 wxFD_OPEN | wxFD_FILE_MUST_EXIST);
   const auto ret = dialog.ShowModal();
   if (ret != wxID_OK) {
     return;
   }
 
   const auto filename = dialog.GetPath().ToStdString();
+
   AtfxFile atfx_file;
   atfx_file.FileName(filename);
   const auto import = atfx_file.Import();
@@ -214,8 +234,7 @@ void MainFrame::OnImport(wxCommandEvent &event) {
   wxString title;
   try {
     const std::filesystem::path full_path(filename);
-    const auto stem = full_path.stem();
-    title = stem.wstring();
+    title = full_path.filename().wstring();
   } catch (const std::exception& error) {
     LOG_ERROR() << "Invalid path. Error: " << error.what() << ", File: " << filename;
   }
@@ -228,6 +247,98 @@ void MainFrame::OnImport(wxCommandEvent &event) {
   ods_doc->SetModel(atfx_file.Model());
   ods_doc->UpdateAllViews();
 
+}
+
+void MainFrame::OnImportSqlite(wxCommandEvent &event) {
+
+  wxFileDialog dialog(this, "Select ODS Source", "", "",
+                      "SQLite Database (*.sqlite)|*.sqlite|All files (*.*)|*.*",
+                      wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+  const auto ret = dialog.ShowModal();
+  if (ret != wxID_OK) {
+    return;
+  }
+
+  const auto filename = dialog.GetPath().ToStdString();
+
+  detail::SqliteDatabase database;
+  database.FileName(filename);
+  IModel model;
+  const auto import = database.ReadModel(model);
+  if (!import) {
+    std::ostringstream err;
+    err << "Import of the model failed!" << std::endl;
+    err << "More information in the log file." << std::endl;
+    err << "Database: " << filename;
+    wxMessageBox(err.str(), L"Import DB Error", wxOK | wxCENTRE | wxICON_ERROR,this);
+    return;
+  }
+
+  auto* doc_manager = wxDocManager::GetDocumentManager();
+  if (doc_manager == nullptr) {
+    LOG_ERROR() << "Failed to get the document manager.";
+    return;
+  }
+  auto* doc = doc_manager->CreateNewDocument();
+  if (doc == nullptr) {
+    LOG_ERROR() << "Failed to create a new document.";
+    return;
+  }
+  wxString title;
+  try {
+    const std::filesystem::path full_path(filename);
+    title = full_path.filename().wstring();
+  } catch (const std::exception& error) {
+    LOG_ERROR() << "Invalid path. Error: " << error.what() << ", File: " << filename;
+  }
+  auto* ods_doc = wxDynamicCast(doc, OdsDocument); // NOLINT
+  if (ods_doc == nullptr) {
+    LOG_ERROR() << "Failed to convert the document.";
+    return;
+  }
+  ods_doc->SetTitle(title);
+  ods_doc->SetModel(model);
+  ods_doc->UpdateAllViews();
+
+}
+
+void MainFrame::OnCreateDbSqlite(wxCommandEvent &event) {
+  auto* man = wxDocManager::GetDocumentManager();
+  auto* doc = man != nullptr ? man->GetCurrentDocument() : nullptr;
+  if (doc == nullptr) {
+    return;
+  }
+  auto* document = wxDynamicCast(doc, OdsDocument); //NOLINT
+  if (document == nullptr) {
+    return;
+  }
+  auto& model = document->GetModel();
+  std::ostringstream temp;
+  temp << model.Name() << ".sqlite";
+
+  wxFileDialog dialog(this, "Select DB File", "", temp.str(),
+                      "SQLite Database (*.sqlite)|*.sqlite|All files (*.*)|*.*",
+                      wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+  const auto ret = dialog.ShowModal();
+  if (ret != wxID_OK) {
+    return;
+  }
+
+  const auto filename = dialog.GetPath().ToStdString();
+
+  detail::SqliteDatabase database;
+  database.FileName(filename);
+  BackupFiles(filename);
+  const auto create = database.Create(model);
+  if (!create) {
+    std::ostringstream err;
+    err << "Create of the database failed!" << std::endl;
+    err << "More information in the log file." << std::endl;
+    err << "Database: " << filename;
+    wxMessageBox(err.str(), L"Create DB Error", wxOK | wxCENTRE | wxICON_ERROR,this);
+    return;
+  }
+  document->UpdateAllViews();
 }
 
 }

@@ -134,5 +134,12 @@ bool Mdf3File::Write(std::FILE* file) {
   return true;
 }
 
+std::string Mdf3File::Version() const {
+  return !id_block_ ? "" : id_block_->VersionString();
+}
+
+std::string Mdf3File::ProgramId() const {
+  return !id_block_ ? "" : id_block_->ProgramId();
+}
 
 }

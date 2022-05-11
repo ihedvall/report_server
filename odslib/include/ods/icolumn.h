@@ -196,6 +196,8 @@ class IColumn {
     default_value_ = value;
   }
 
+  [[nodiscard]] bool IsString() const;
+
  private:
   int64_t table_id_ = 0;     ///< Reference to father table.
   int64_t column_id_ = 0;    ///< Order number within the table.

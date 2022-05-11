@@ -121,4 +121,21 @@ TEST(StringUtil, WildcardMatch) { //NOLINT
   EXPECT_FALSE(WildcardMatch("Paul was her but OLLE was not", "*lle*", false));
 }
 
+TEST(StringUtil, FlaotStringConversion) { //NOLINT
+  {
+    const auto orig = 1.23F;
+    const auto text =  FloatToString(orig);
+    std::cout << text << std::endl;
+    const auto dest = std::stof(text);
+    EXPECT_EQ(orig, dest);
+  }
+  {
+    const auto orig = 1.23;
+    const auto text =  DoubleToString(orig);
+    std::cout << text << std::endl;
+    const auto dest = std::stod(text);
+    EXPECT_EQ(orig, dest);
+  }
+}
+
 } //namespace util::test

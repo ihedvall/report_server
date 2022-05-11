@@ -6,6 +6,8 @@
 #include "util/stringutil.h"
 #include "ods/itable.h"
 #include "ods/baseattribute.h"
+using namespace util::string;
+
 namespace ods {
 
 IColumn CreateDefaultColumn(BaseId base_id, const std::string &base_name) {
@@ -145,6 +147,31 @@ void ITable::ParentId(int64_t id) {
   });
   parent_id_ = id;
 }
+
+int64_t ITable::FindNextColumnId() const {
+  for (int64_t next = 1; next < static_cast<int64_t>(column_list_.size() + 10); ++next) {
+    const auto exist = std::ranges::any_of(column_list_, [&] (const auto& column) {
+    return column.ColumnId() == next;
+    });
+    if (!exist) {
+      return next;
+    }
+  }
+  return 0;
+}
+
+
+ITable::ColumnList ITable::MakeUniqueList() const {
+  std::vector<IColumn> unique_list;
+  for (const auto& column : column_list_) {
+    if (column.DatabaseName().empty() || IEquals(column.BaseName(), "id") || !column.Unique()) {
+      continue;
+    }
+    unique_list.emplace_back(column);
+  }
+  return unique_list;
+}
+
 
 } // end namespace
 

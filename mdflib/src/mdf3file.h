@@ -19,10 +19,13 @@ class Mdf3File : public MdfFile {
 
   void Attachments(AttachmentList& dest) const override;
   void DataGroups(DataGroupList& dest ) const override;
-  IHeader* Header() const;
-  IDataGroup* CreateDataGroup();
+  [[nodiscard]] std::string Version() const override;
+  [[nodiscard]] std::string ProgramId() const override;
+  [[nodiscard]] IHeader* Header() const override;
 
-  const IBlock* Find(fpos_t id) const;
+  [[nodiscard]] IDataGroup* CreateDataGroup();
+
+  [[nodiscard]] const IBlock* Find(fpos_t id) const;
 
   [[nodiscard]] bool IsMdf4() const override;
 
@@ -30,8 +33,8 @@ class Mdf3File : public MdfFile {
   void ReadMeasurementInfo(std::FILE *file) override;
   void ReadEverythingButData(std::FILE *file) override;
 
-  const IdBlock &Id() const;
-  const Hd3Block &Hd() const;
+  [[nodiscard]] const IdBlock &Id() const;
+  [[nodiscard]] const Hd3Block &Hd() const;
 
   bool Write(std::FILE* file);
 

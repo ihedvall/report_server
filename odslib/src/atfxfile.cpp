@@ -339,7 +339,7 @@ void AtfxFile::FixRelation(const util::xml::IXmlNode& node, const ITable& table)
 }
 
 void AtfxFile::ImportDataRow(const util::xml::IXmlNode &node) {
-  OdsRow row(node.TagName());
+  IItem row(node.TagName());
   IXmlNode::ChildList list;
   node.GetChildList(list);
   for (const auto* item : list) {
@@ -349,8 +349,8 @@ void AtfxFile::ImportDataRow(const util::xml::IXmlNode &node) {
 
     const std::string& column = item->TagName();
     const std::string& value = item->Value<std::string>();
-    OdsItem temp(column, value);
-    row.AddItem(temp);
+    IAttribute temp(column, value);
+    row.AppendAttribute(temp);
   }
   instance_data_.emplace_back(row);
 }
@@ -371,8 +371,8 @@ void AtfxFile::FixUnits() {
     if (!IEquals(data.ApplicationName(), unit_table->ApplicationName())) {
       continue;
     }
-    const auto* id_item = data.GetItem(id_column->ApplicationName());
-    const auto* name_item = data.GetItem(name_column->ApplicationName());
+    const auto* id_item = data.GetAttribute(id_column->ApplicationName());
+    const auto* name_item = data.GetAttribute(name_column->ApplicationName());
     if (id_item == nullptr || name_item == nullptr) {
       continue;
     }

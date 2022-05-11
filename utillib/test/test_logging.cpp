@@ -4,6 +4,7 @@
  */
 #include <atomic>
 #include <thread>
+#include <array>
 #include <gtest/gtest.h>
 #include "util/logging.h"
 #include "util/logstream.h"

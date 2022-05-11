@@ -103,6 +103,7 @@ class IBlock {
   }
 
   [[nodiscard]] const Md4Block *Md4() const;
+  void  Md4(const std::string& xml);
 
   virtual size_t Read(std::FILE *file) = 0;
   virtual size_t Write(std::FILE *file);

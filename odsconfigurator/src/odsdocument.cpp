@@ -61,7 +61,11 @@ ITable *OdsDocument::GetSelectedTable() {
 bool OdsDocument::DoSaveDocument(const wxString &file) {
   util::log::BackupFiles(file.ToStdString(), true);
 
-  return model_.SaveModel(file.ToStdString());
+  const auto save = model_.SaveModel(file.ToStdString());
+  if (save) {
+    original_ = model_;
+  }
+  return save;
 }
 
 bool OdsDocument::DoOpenDocument(const wxString &file) {
@@ -71,6 +75,7 @@ bool OdsDocument::DoOpenDocument(const wxString &file) {
     return false;
   }
   original_ = model_;
+  SetFilename(file,true);
   return true;
 }
 } // namespace mdf::viewer

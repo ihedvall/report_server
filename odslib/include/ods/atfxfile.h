@@ -6,7 +6,7 @@
 #pragma once
 #include <string>
 #include "ods/imodel.h"
-#include "ods/odsrow.h"
+#include "ods/iitem.h"
 namespace ods {
 
 class AtfxFile {
@@ -27,7 +27,7 @@ class AtfxFile {
  private:
   IModel model_;
   std::string filename_;
-  std::vector<OdsRow> instance_data_;
+  std::vector<IItem> instance_data_;
 
   void ImportDocumentation(const util::xml::IXmlNode& node);
   void ImportAppModel(const util::xml::IXmlNode& node);

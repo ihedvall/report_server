@@ -4,6 +4,9 @@
  */
 #pragma once
 #include <cstdint>
+#include <string>
+#include <map>
+#include <unordered_map>
 #include "ods/ienum.h"
 
 namespace ods {
@@ -109,5 +112,27 @@ constexpr uint16_t kIndex = 0x80;
 
 IEnum CreateDefaultEnum(const std::string& enum_name);
 
+enum class EnvironmentType : int {
+  kTypeUnknown = 0,
+  kTypeGeneric = 1,
+  kTypeTestDirectory = 2
+};
+
+EnvironmentType TextToEnvType(const std::string& );
+std::string EnvTypeToText(EnvironmentType type);
+std::string EnvTypeToUserText(EnvironmentType type);
+/**
+ * Commonly used to fetch index to name lists
+ */
+using IdNameMap = std::unordered_map<int64_t, std::string>;
+
+enum class StorageType : int {
+  kDatabase = 0,
+  kExternalOnly = 1,
+  kMixed = 2,
+  kForeignFormat = 3
+};
+
+using NameIdMap = std::map<std::string, int64_t>;
 
 } // end namespace

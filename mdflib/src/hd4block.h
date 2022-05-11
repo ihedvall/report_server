@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <cstdio>
+#include "mdf/iheader.h"
 #include "iblock.h"
 #include "dg4block.h"
 #include "fh4block.h"
@@ -29,7 +30,7 @@ namespace Hd4Flags {
   constexpr uint8_t kStartDistanceValid = 0x02;
 }
 
-class Hd4Block : public IBlock {
+class Hd4Block : public IBlock, public IHeader {
  public:
   using Dg4List = std::vector<std::unique_ptr<Dg4Block>>;
   using Fh4List = std::vector<std::unique_ptr<Fh4Block>>;
@@ -37,6 +38,39 @@ class Hd4Block : public IBlock {
   using At4List = std::vector<std::unique_ptr<At4Block>>;
   using Ev4List = std::vector<std::unique_ptr<Ev4Block>>;
 
+  [[nodiscard]] int64_t Index() const override;
+
+  void Author(const std::string &author) override;
+  [[nodiscard]] std::string Author() const override;
+
+  void Department(const std::string &department) override;
+  [[nodiscard]] std::string Department() const override;
+
+  void Project(const std::string &name) override;
+  [[nodiscard]] std::string Project() const override;
+
+  void Subject(const std::string &subject) override;
+  [[nodiscard]] std::string Subject() const override;
+
+  void Description(const std::string &description) override;
+  [[nodiscard]] std::string Description() const override;
+
+  void MeasurementId(const std::string& uuid) override;
+  [[nodiscard]] std::string MeasurementId() const override;
+
+  void RecorderId(const std::string& uuid) override;
+  [[nodiscard]] std::string RecorderId() const override;
+
+  void RecorderIndex(int64_t index) override;
+  [[nodiscard]] int64_t RecorderIndex() const override;
+
+  void StartTime(uint64_t ns_since_1970) override;
+  [[nodiscard]] uint64_t StartTime() const override;
+
+  void MetaData(const std::string &meta_data) override;
+  [[nodiscard]] std::string MetaData() const override;
+  [[nodiscard]] std::vector<IDataGroup *> DataGroups() const override;
+  [[nodiscard]] IDataGroup *LastDataGroup() const override;
   [[nodiscard]] const Dg4List &Dg4() const {
     return dg_list_;
   }

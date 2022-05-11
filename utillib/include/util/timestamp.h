@@ -21,7 +21,7 @@
 #include <string>
 #include <chrono>
 #include <vector>
-
+#include <filesystem>
 
 namespace util::time {
 /** \typedef SystemClock
@@ -71,17 +71,19 @@ std::string NsToLocalIsoTime(uint64_t ns_since_1970);
 /** \brief Converts a nanosecond since 1970 to a UTC ISO date and time string.
  *
  * @param [in] ns_since_1970 Nanosecond since 1970
+ * @param [in] format 0: Include seconds, 1: Include ms, 2: include micro-seconds, 3: Include ns
  * @return Return a date and time string in format YYYY-MM-DDThh:mm:ss.sssssssssZ
  */
 std::string NsToIsoTime(uint64_t ns_since_1970, int format = 0);
 
 /** \brief Converts an ISO UTC string to nanosecond since 1970.
  *
- * @param [in] ISO Time stamp string YYYY-MM-DDThh:mm:ss.sssssssssZ
- * @param [in] format 0: Include seconds, 1: Include ms, 2: include micro-seconds, 3: Include ns
+ * Converts an ISO Date/Time string to nano-seconds since 1970. Note that the
+ * function also handle ODS date strings 'YYYYMMDD..'.
+ * @param [in] iso_time Time stamp string YYYY-MM-DDThh:mm:ss.sssssssssZ
  * @return Return a date and time string in format
  */
-uint64_t IsoTimeToNs(const std::string& iso_time);
+uint64_t IsoTimeToNs(const std::string& iso_time, bool local_time = false);
 
 /** \brief Converts system clock to ns since midnight 1970.
  *
@@ -211,10 +213,21 @@ int64_t TimeZoneOffset();
 /** \brief Converts an ODS date and time string to nanoseconds since 1970.
  *
  * Converts an ODS date and time string to nanoseconds since 1970. The ODS
- * DT_DATE string have the format 'YYYYMMDDhhmmsslllcccnnn'.
+ * DT_DATE string have the format 'YYYYMMDDhhmmsslllcccnnn'. Note that the
+ * function also handle ISO time formats as 'YYYY-MM-DD hh:mm:ss(.*)'
  * @param ods_date ODS date string
  * @return Nanoseconds since 1970
  */
 uint64_t OdsDateToNs(const std::string& ods_date);
+
+/** \brief Converts from std::filesystem file_clock to ns since 1970.
+ *
+ * Converts to a file time to nano-seconds since 1970. Note that this function
+ * actually hides a problem between MSC and GCC implementation.
+ *
+ * @param time Time point of a file clock
+ * @return Nano-seconds since 1970
+ */
+uint64_t FileTimeToNs( std::filesystem::file_time_type time);
 
 }

@@ -1,7 +1,9 @@
 /*
  * Copyright 2021 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
- */#include <filesystem>
+ */
+#include <array>
+#include <filesystem>
 #include "expatxml.h"
 #include "util/logstream.h"
 

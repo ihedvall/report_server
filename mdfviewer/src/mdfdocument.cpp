@@ -55,22 +55,17 @@ std::string CreateCsvFile(const mdf::ChannelObserverList& list) {
     LOG_ERROR() << "Failed to create the CSV file. Error: " << error.what();
   }
 
- util::string::CsvWriter csv(csv_file);
+ util::plot::CsvWriter csv(csv_file);
 
   const bool master = list.size() > 1 && list[0]->IsMaster();
 
   // Add the header first
   if (!master) {
     // First column is sample number
-    csv.AddColumnHeader("Sample");
+    csv.AddColumnHeader("Sample", "");
   }
   for (const auto& channel : list) {
-     std::ostringstream s;
-     s << channel->Name();
-     if (!channel->Unit().empty()) {
-       s << " [" << channel->Unit() << "]";
-     }
-     csv.AddColumnHeader(s.str());
+     csv.AddColumnHeader(channel->Name(),channel->Unit());
   }
   csv.AddRow();
   // Add the samples
@@ -128,7 +123,7 @@ std::string CreateGnuPlotFile(const mdf::ChannelObserverList& list, const std::s
   }
 
   if (file != nullptr) {
-    fprintf(file, "set terminal wxt noenhanced title \"%s\" size 1200, 800\n", title.c_str());
+    fprintf(file, "set terminal wxt noenhanced title \"%s\" size 1200, 1000\n", title.c_str());
     fprintf(file, "set datafile separator comma\n");
     fprintf(file, "set key outside autotitle columnheader\n");
     fprintf(file, "set xlabel \"%s\"\n", x_label.str().c_str());

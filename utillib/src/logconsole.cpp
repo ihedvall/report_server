@@ -32,7 +32,7 @@ void LogConsole::AddLogMessage(const LogMessage &message) {
   std::lock_guard<std::mutex> guard(locker_); // Fix multi-thread issue
 
   std::clog << "[" << time << "] "
-            << "[" << severity << "] "
+            <<  severity << " "
             << "[" << GetStem(message.location.file_name()) << ":"
             << message.location.function_name()
             << ":" << message.location.line() << "] "

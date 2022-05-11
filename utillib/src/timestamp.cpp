@@ -192,13 +192,15 @@ uint64_t CanOpenTimeArrayToNs(const std::vector<uint8_t> &buffer) {
 }
 
 std::string NsToLocalIsoTime(uint64_t ns_since_1970) {
-   const auto ms_sec = (ns_since_1970 / 1'000'000) % 1'000;
+  const auto ms_sec = (ns_since_1970 / 1'000'000) % 1'000;
   const auto system_time = static_cast<std::time_t>(ns_since_1970 / 1'000'000'000);
   struct tm bt{};
   localtime_s(&bt, &system_time);
   std::ostringstream text;
-  text << std::put_time(&bt, "%Y-%m-%d %H:%M:%S")
-       << '.' << std::setfill('0') << std::setw(3) << ms_sec;
+  text << std::put_time(&bt, "%Y-%m-%d %H:%M:%S");
+  if (ms_sec > 0) {
+    text << '.' << std::setfill('0') << std::setw(3) << ms_sec;
+  }
   return text.str();
 }
 
@@ -237,10 +239,15 @@ std::string NsToIsoTime(uint64_t ns_since_1970, int format) {
   return text.str();
 }
 
-uint64_t IsoTimeToNs(const std::string& iso_time) {
+uint64_t IsoTimeToNs(const std::string& iso_time, bool local_time) {
   if (iso_time.empty()) {
     return 0;
   }
+  const auto ods_time = strchr(iso_time.c_str(), '-') == nullptr;
+  if (ods_time) {
+    return OdsDateToNs(iso_time);
+  }
+
   std::vector<uint64_t> temp_list;
   uint8_t ns_count = 0;
   uint64_t temp = 0;
@@ -256,8 +263,18 @@ uint64_t IsoTimeToNs(const std::string& iso_time) {
       temp = 0;
     }
   }
+  if (temp > 0) {
+    temp_list.push_back(temp);
+  }
   uint64_t nano_sec = 0;
   struct tm bt{};
+  bt.tm_year = 70;
+  bt.tm_mon = 0;
+  bt.tm_mday = 1;
+  bt.tm_hour = 0;
+  bt.tm_min = 0;
+  bt.tm_sec = 0;
+
   for (size_t index = 0; index < temp_list.size(); ++index) {
     int value = static_cast<int>(temp_list[index]);
     switch (index) {
@@ -300,7 +317,7 @@ uint64_t IsoTimeToNs(const std::string& iso_time) {
         break;
     }
   }
-  auto ns_1970 = static_cast<uint64_t>(_mkgmtime(&bt));
+  auto ns_1970 = static_cast<uint64_t>(local_time ? mktime(&bt) : _mkgmtime(&bt));
   ns_1970 *= 1'000'000'000;
   ns_1970 += nano_sec;
   return ns_1970;
@@ -360,7 +377,7 @@ std::string NsToLocalTime(uint64_t ns_since_1970, int format) {
       }
       is_am_pm = true;
       output << char_in;
-    } else if (std::iswspace(char_in)) {
+    } else if (iswspace(char_in)) {
       is_blank = true;
     } else {
       if (is_blank) {
@@ -379,6 +396,11 @@ uint64_t OdsDateToNs(const std::string &ods_date) {
   if (ods_date.empty()) {
     return 0;
   }
+  const auto iso_time = strchr(ods_date.c_str(), '-') != nullptr;
+  if (iso_time) {
+    return IsoTimeToNs(ods_date);
+  }
+
   std::vector<uint64_t> temp_list;
   uint8_t ns_count = 0; // Counter for nof digits
   uint64_t temp = 0; // Holder for the value
@@ -480,6 +502,16 @@ uint64_t OdsDateToNs(const std::string &ods_date) {
   ns_1970 += nano_sec;
   return ns_1970;
 
+}
+
+uint64_t FileTimeToNs(std::filesystem::file_time_type time) {
+#if defined _MSC_VER
+  const auto sys_time = std::chrono::clock_cast<std::chrono::system_clock>(time);
+  return TimeStampToNs(sys_time);
+#else
+  const auto sys_time = std::chrono::file_clock::to_sys(time);
+  return TimeStampToNs(sys_time);
+#endif
 }
 
 }

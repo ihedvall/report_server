@@ -10,12 +10,12 @@ namespace ods {
 class DatabaseGuard final {
  public:
 
-  DatabaseGuard(IDatabase& database);
+  explicit DatabaseGuard(IDatabase& database);
   DatabaseGuard() = delete;
   ~DatabaseGuard();
 
   void Rollback();
-  bool IsOk() const;
+  [[nodiscard]] bool IsOk() const;
  private:
   IDatabase* database_ = nullptr;
   bool db_ok_ = false;

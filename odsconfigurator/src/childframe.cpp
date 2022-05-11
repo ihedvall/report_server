@@ -143,9 +143,10 @@ void ChildFrame::OnCloseDoc(wxCommandEvent& event) {
     doc->DeleteAllViews();
   }
 }
+
 void ChildFrame::Update() {
-  auto *doc = GetDocument();
-  if (doc != nullptr) {
+  const auto* doc = GetDoc();
+  if (doc != nullptr && !doc->GetTitle().empty() && GetTitle() != doc->GetTitle()) {
     SetTitle(doc->GetTitle());
   }
   for (size_t tab = 0; tab < notebook_->GetPageCount(); ++tab) {
@@ -154,7 +155,7 @@ void ChildFrame::Update() {
       page->Update();
     }
   }
-  wxWindow::Update();
+  wxDocMDIChildFrame::Update();
 }
 
 void ChildFrame::OnPageChange(wxBookCtrlEvent &event) {
@@ -218,9 +219,15 @@ void ChildFrame::OnAddTable(wxCommandEvent &event) {
   if (ret != wxID_OK) {
     return;
   }
-
+  const auto name = dialog.GetTable().ApplicationName();
   model.AddTable(dialog.GetTable());
-  Update();
+
+  auto* table_panel = dynamic_cast<TablePanel*>(notebook_->GetCurrentPage());
+  if (table_panel == nullptr) {
+    return;
+  }
+  table_panel->RedrawTableList();
+  table_panel->SelectTable(dialog.GetTable().ApplicationName());
 }
 
 void ChildFrame::OnEditTable(wxCommandEvent &event) {

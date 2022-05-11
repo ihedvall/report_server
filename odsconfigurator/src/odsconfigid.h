@@ -44,4 +44,8 @@ constexpr wxWindowID kIdColumnDown = 41;
 constexpr wxWindowID kIdCopyEnum = 42;
 constexpr wxWindowID kIdPasteEnum = 43;
 constexpr wxWindowID kIdImportFile = 44;
+constexpr wxWindowID kIdImportSqlite = 45;
+constexpr wxWindowID kIdCreateDbSqlite = 46;
+constexpr wxWindowID kIdIndexFlag = 47;
+constexpr wxWindowID kIdNoIndexFlag = 48;
 }

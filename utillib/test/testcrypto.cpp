@@ -24,16 +24,14 @@ TEST(CryptoUtil, CreateMd5FileChecksum)// NOLINT
   }
 
   // Test that it runs normally
-  std::string md5_normal;
-  const bool normal = crypto::CreateMd5FileString(kTestFile.data(), md5_normal);
-  EXPECT_TRUE(normal);
+  const auto md5_normal = crypto::CreateMd5FileString(kTestFile.data());
+  EXPECT_TRUE(!md5_normal.empty());
   EXPECT_EQ(md5_normal.size(), 32U) << md5_normal;
 
   // Check that it handles files missing
-  std::string md5_abnormal;
-  const bool abnormal = crypto::CreateMd5FileString("testXXX.exe", md5_abnormal);
-  EXPECT_FALSE(abnormal);
-  EXPECT_EQ(md5_abnormal.size(), 0U);
+  const auto md5_abnormal = crypto::CreateMd5FileString("testXXX.exe");
+  EXPECT_TRUE(md5_abnormal.empty());
+
 }
 
 } // namespace util::test

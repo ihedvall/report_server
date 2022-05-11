@@ -4,6 +4,9 @@
  */
 #include "hd4block.h"
 #include "util/ixmlfile.h"
+
+using namespace util::xml;
+
 namespace {
   // LINK index
 constexpr size_t kIndexDg = 0;
@@ -13,6 +16,42 @@ constexpr size_t kIndexAt = 3;
 constexpr size_t kIndexEv = 4;
 constexpr size_t kIndexMd = 5;
 constexpr size_t kIndexNext = 0;
+
+template <typename T>
+T GetCommonProperty(const mdf::detail::Hd4Block& block, const std::string &key) {
+  const auto* md4 = block.Md4();
+  if (md4 == nullptr || md4->IsTxtBlock()) {
+    return {};
+  }
+  auto xml_file = util::xml::CreateXmlFile("Expat");
+  xml_file->ParseString(md4->Text());
+  const auto* common = xml_file->GetNode("common_properties");
+  if (common == nullptr) {
+    return {};
+  }
+  const auto* key_node = common->GetNode("e", "name", key);
+  return key_node == nullptr ? T {} : key_node->Value<T>();
+}
+
+template <typename T>
+void SetCommonProperty(mdf::detail::Hd4Block& block, const std::string &key, const T &value) {
+  auto xml_file = util::xml::CreateXmlFile("Expat");
+  const auto* md4 = block.Md4();
+  if (md4 != nullptr) {
+    xml_file->ParseString(md4->Text());
+  }
+  auto& root = xml_file->RootName("HDcomment");
+  auto& common = root.AddUniqueNode("common_properties");
+  auto& key_node = root.AddUniqueNode("e", "name", key);
+  if (typeid(T) == typeid(int64_t)) {
+    key_node.SetAttribute<std::string>("type", "integer");
+  } else if (typeid(T) == typeid(std::string)) {
+    key_node.SetAttribute<std::string>("type", "string");
+  }
+  key_node.Value(value);
+  block.Md4(xml_file->WriteString(true));
+}
+
 }
 
 namespace mdf::detail {
@@ -197,5 +236,112 @@ void Hd4Block::ReadEverythingButData(std::FILE *file) {
     }
   }
 }
+
+int64_t Hd4Block::Index() const {
+  return FilePosition();
+}
+
+void Hd4Block::Author(const std::string &author) {
+  SetCommonProperty(*this, "author", author);
+}
+
+std::string Hd4Block::Author() const {
+  return GetCommonProperty<std::string>(*this, "author");
+}
+
+void Hd4Block::Department(const std::string &department) {
+  SetCommonProperty(*this, "department", department);
+}
+
+std::string Hd4Block::Department() const {
+  return GetCommonProperty<std::string>(*this, "department");
+}
+
+void Hd4Block::Project(const std::string &name) {
+  SetCommonProperty(*this, "project", name);
+}
+
+std::string Hd4Block::Project() const {
+  return GetCommonProperty<std::string>(*this, "project");
+}
+
+void Hd4Block::Subject(const std::string &subject) {
+  SetCommonProperty(*this, "subject", subject);
+}
+
+std::string Hd4Block::Subject() const {
+  return GetCommonProperty<std::string>(*this, "subject");
+}
+
+void Hd4Block::Description(const std::string &description) {
+  auto xml_file = util::xml::CreateXmlFile("Expat");
+  const auto* md4 = Md4();
+  if (md4 != nullptr) {
+    xml_file->ParseString(md4->Text());
+  }
+  auto& root = xml_file->RootName("HDcomment");
+  auto& tx_node = root.AddUniqueNode("TX");
+  tx_node.Value(description);
+  Md4(xml_file->WriteString(true));
+}
+
+std::string Hd4Block::Description() const {
+  return Comment();
+}
+
+void Hd4Block::MeasurementId(const std::string &uuid) {
+  SetCommonProperty(*this, "Measurement.UUID", uuid);
+}
+
+std::string Hd4Block::MeasurementId() const {
+  return GetCommonProperty<std::string>(*this, "Measurement.UUID");
+}
+
+void Hd4Block::RecorderId(const std::string &uuid) {
+  SetCommonProperty(*this,"Recorder.UUID", uuid);
+}
+
+std::string Hd4Block::RecorderId() const {
+  return GetCommonProperty<std::string>(*this,"Recorder.UUID");
+}
+
+void Hd4Block::RecorderIndex(int64_t index) {
+  SetCommonProperty(*this,"Recorder.FileIndex", index);
+}
+
+int64_t Hd4Block::RecorderIndex() const {
+  return GetCommonProperty<int64_t>(*this,"Recorder.FileIndex");
+}
+
+void Hd4Block::StartTime(uint64_t ns_since_1970) {
+  timestamp_.NsSince1970(ns_since_1970);
+}
+
+uint64_t Hd4Block::StartTime() const {
+  return timestamp_.NsSince1970();
+}
+
+void Hd4Block::MetaData(const std::string &meta_data) {
+  Md4(meta_data);
+}
+
+std::string Hd4Block::MetaData() const {
+  const auto* md4 = Md4();
+  return md4 == nullptr ?  std::string() : md4->Text();
+}
+
+IDataGroup *Hd4Block::LastDataGroup() const {
+  return dg_list_.empty() ? nullptr : dg_list_.back().get();
+}
+
+std::vector<IDataGroup *> Hd4Block::DataGroups() const {
+  std::vector<IDataGroup *> list;
+  std::ranges::for_each(dg_list_, [&] (const auto& dg) { list.push_back(dg.get());  });
+  return list;
+}
+
+
+
+
 
 }

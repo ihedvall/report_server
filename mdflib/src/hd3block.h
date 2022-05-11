@@ -27,8 +27,8 @@ class Hd3Block : public IBlock, public IHeader {
   void Department(const std::string &department) override;
   [[nodiscard]] std::string Department() const override;
 
-  void Name(const std::string &name) override;
-  [[nodiscard]] std::string Name() const override;
+  void Project(const std::string &name) override;
+  [[nodiscard]] std::string Project() const override;
 
   void Subject(const std::string &subject) override;
   [[nodiscard]] std::string Subject() const override;
@@ -41,8 +41,8 @@ class Hd3Block : public IBlock, public IHeader {
 
   void MetaData(const std::string &meta_data) override;
   [[nodiscard]] std::string MetaData() const override;
-  std::vector<IDataGroup *> DataGroups() const override;
-  IDataGroup *LastDataGroup() const override;
+  [[nodiscard]] std::vector<IDataGroup *> DataGroups() const override;
+  [[nodiscard]] IDataGroup *LastDataGroup() const override;
 
 
   void AddDg3(std::unique_ptr<Dg3Block>& dg3);

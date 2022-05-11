@@ -88,3 +88,6 @@ fabric.properties
     About
 
 cmake-build-*
+
+# ODS models
+odsconfigurator/model/*_?.xml

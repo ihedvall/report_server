@@ -91,6 +91,11 @@ wxBEGIN_EVENT_TABLE(TablePanel, wxPanel) // NOLINT
         EVT_MENU(kIdUniqueFlag, TablePanel::OnUniqueFlag)
         EVT_MENU(kIdNoUniqueFlag, TablePanel::OnNoUniqueFlag)
 
+        EVT_UPDATE_UI(kIdIndexFlag, TablePanel::OnUpdateColumnSelected)
+        EVT_UPDATE_UI(kIdNoIndexFlag, TablePanel::OnUpdateColumnSelected)
+        EVT_MENU(kIdIndexFlag, TablePanel::OnIndexFlag)
+        EVT_MENU(kIdNoIndexFlag, TablePanel::OnNoIndexFlag)
+
         EVT_UPDATE_UI(kIdColumnUp, TablePanel::OnUpdateColumnSelected)
         EVT_UPDATE_UI(kIdColumnDown, TablePanel::OnUpdateColumnSelected)
         EVT_MENU(kIdColumnUp, TablePanel::OnColumnUp)
@@ -382,6 +387,10 @@ void TablePanel::OnColumnRightClick(wxContextMenuEvent& event) {
   menu.AppendSeparator();
   menu.Append(kIdUniqueFlag, L"Set Unique Column");
   menu.Append(kIdNoUniqueFlag, L"Unset Unique Column" );
+  menu.AppendSeparator();
+  menu.Append(kIdIndexFlag, L"Set Indexed Column");
+  menu.Append(kIdNoIndexFlag, L"Unset Indexed Column" );
+  menu.AppendSeparator();
   menu.Append(kIdColumnUp, L"Move Up");
   menu.Append(kIdColumnDown, L"Move Down" );
   PopupMenu(&menu);
@@ -552,6 +561,44 @@ void TablePanel::OnNoUniqueFlag(wxCommandEvent&) {
     auto* column = const_cast<IColumn*>(column_c);
     if (column != nullptr) {
       column->Unique(false);
+    }
+  }
+  RedrawColumnList();
+}
+
+void TablePanel::OnIndexFlag(wxCommandEvent&) {
+  auto* doc = GetDocument();
+  if (doc == nullptr || right_ == nullptr) {
+    return;
+  }
+  auto* table = doc->GetSelectedTable();
+  if (table == nullptr) {
+    return;
+  }
+  for (auto item = right_->GetFirstSelected(); item >= 0; item = right_->GetNextSelected(item)) {
+    const auto* column_c = table->GetColumnByName(right_->GetItemText(item, 1).utf8_string());
+    auto* column = const_cast<IColumn*>(column_c);
+    if (column != nullptr) {
+      column->Index(true);
+    }
+  }
+  RedrawColumnList();
+}
+
+void TablePanel::OnNoIndexFlag(wxCommandEvent&) {
+  auto* doc = GetDocument();
+  if (doc == nullptr || right_ == nullptr) {
+    return;
+  }
+  auto* table = doc->GetSelectedTable();
+  if (table == nullptr) {
+    return;
+  }
+  for (auto item = right_->GetFirstSelected(); item >= 0; item = right_->GetNextSelected(item)) {
+    const auto* column_c = table->GetColumnByName(right_->GetItemText(item, 1).utf8_string());
+    auto* column = const_cast<IColumn*>(column_c);
+    if (column != nullptr) {
+      column->Index(false);
     }
   }
   RedrawColumnList();

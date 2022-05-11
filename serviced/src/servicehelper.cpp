@@ -194,7 +194,7 @@ void ServiceHelper::ReportStatus() {
     case SERVICE_PAUSED:
     case SERVICE_RUNNING:
     default:
-      status.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PRESHUTDOWN | SERVICE_ACCEPT_SHUTDOWN;
+      status.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
       check_point_ = 0;
       break;
   }
@@ -215,7 +215,6 @@ bool ServiceHelper::RegisterService() {
 
 DWORD ServiceHelper::SvcCtrlHandler(DWORD control, DWORD , void *, void *) {
   switch(control) {
-      case SERVICE_CONTROL_PRESHUTDOWN:
       case SERVICE_CONTROL_SHUTDOWN:
       case SERVICE_CONTROL_STOP:
       stop_ = true;

@@ -91,6 +91,7 @@ namespace util::xml {
   * @return True if the tag name match.
   */
   [[nodiscard]] bool IsTagName(const std::string& tag) const;
+  [[nodiscard]] bool IsAttribute(const std::string& key, const std::string& value) const;
 
   /** \brief Returns an attribute.
    *
@@ -133,7 +134,7 @@ namespace util::xml {
    * @return Returns the tag value
    */
   template<typename T>
-  T Value() const {
+  [[nodiscard]] T Value() const {
     return XValue<T>(value_);
   }
 
@@ -167,7 +168,7 @@ namespace util::xml {
 
   template<typename T>
   void SetProperty(const std::string &key, const T &value) {
-    auto& node = AddNode(key);
+    auto& node = AddUniqueNode(key);
     node.Value(value);
    }
 
@@ -177,6 +178,8 @@ namespace util::xml {
   using ChildList = std::vector<const IXmlNode *>;
   virtual void GetChildList(ChildList &child_list) const; ///< Returns the child nodes.
   virtual const IXmlNode *GetNode(const std::string &tag) const; ///< Returns a node if it exist.
+  virtual const IXmlNode *GetNode(const std::string &tag, const std::string& key,
+                                  const std::string& attr) const; ///< Returns a node with a specific attribute.
 
   /** \brief Returns true if the named property exist.
    *
@@ -190,6 +193,9 @@ namespace util::xml {
   }
 
   virtual IXmlNode& AddNode(const std::string& name);
+  virtual IXmlNode& AddUniqueNode(const std::string& name);
+  virtual IXmlNode& AddUniqueNode(const std::string& name, const std::string& key, const std::string& attr);
+
   virtual void AddNode(std::unique_ptr<IXmlNode> p);
 
   virtual void Write(std::ostream& dest, size_t level);

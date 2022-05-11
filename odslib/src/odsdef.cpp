@@ -159,6 +159,18 @@ constexpr std::array<SeqDef,14> kSequenceList = {
     SeqDef{13, "raw_rational_external"},
 };
 
+struct EnvTypeDef {
+  const int EnvType;
+  const std::string_view TypeName1; ///< Computer text name
+  const std::string_view TypeName2; ///< Display text
+};
+
+constexpr std::array<EnvTypeDef,2> kEnvTypeList = {
+    EnvTypeDef{1, "Generic", "Generic ODS Environment"},
+    EnvTypeDef{2, "TestDirectory", "Test Directory Environment"},
+};
+
+
 } // end namespace
 
 namespace ods {
@@ -220,7 +232,7 @@ std::string DataTypeToText(DataType type) {
       return tid.TypeName1.data();
     }
   }
-  return "DtUnknown";
+  return "";
 }
 
 std::string DataTypeToUserText(DataType type) {
@@ -231,8 +243,9 @@ std::string DataTypeToUserText(DataType type) {
       return tid.TypeName3.data();
     }
   }
-  return "Unknown";
+  return "";
 }
+
 IEnum CreateDefaultEnum(const std::string &enum_name) {
   IEnum enumerate;
   enumerate.EnumName(enum_name);
@@ -265,6 +278,39 @@ IEnum CreateDefaultEnum(const std::string &enum_name) {
   return enumerate;
 }
 
-
+std::string EnvTypeToText(EnvironmentType type) {
+  const int temp = static_cast<int> (type);
+  const auto itr = std::ranges::find_if(kEnvTypeList, [&] (const auto& itr) {
+    return temp == itr.EnvType;
+  });
+  return itr == kEnvTypeList.cend() ? "": itr->TypeName1.data();
 }
+
+std::string EnvTypeToUserText(EnvironmentType type) {
+  const int temp = static_cast<int> (type);
+  const auto itr = std::ranges::find_if(kEnvTypeList, [&] (const auto& itr) {
+    return temp == itr.EnvType;
+  });
+  return itr == kEnvTypeList.cend() ? "": itr->TypeName2.data();
+}
+
+EnvironmentType TextToEnvType(const std::string &text) {
+  int temp = -1;
+  try {
+    temp = std::stoi(text);
+  } catch(const std::exception&) {
+    // Normal if not an integer
+  }
+
+  for (const auto type : kEnvTypeList) {
+    if (temp == type.EnvType ||
+        IEquals(text,type.TypeName1.data()) ||
+        IEquals(text,type.TypeName2.data()) ) {
+      return static_cast<EnvironmentType>(type.EnvType);
+    }
+  }
+  return EnvironmentType::kTypeUnknown;
+}
+
+} // end namespace
 

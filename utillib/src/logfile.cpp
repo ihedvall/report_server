@@ -177,7 +177,7 @@ void LogFile::HandleMessage(const LogMessage &m) {
   } else {
     temp << m.message << " ";
   }
-  temp << "[" << GetStem(m.location.file_name()) << ":"
+  temp << "    [" << GetStem(m.location.file_name()) << ":"
        << m.location.function_name()
        << ":" << m.location.line() << "]"
        << std::endl;

@@ -84,7 +84,7 @@ ColumnDialog::ColumnDialog(wxWindow *parent, IModel& model, const IColumn& origi
   base_name->SetMinSize({20*10, -1});
 
   auto* desc = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize, 0,
-                                         wxTextValidator(wxFILTER_NONE, &base_name_));
+                                         wxTextValidator(wxFILTER_NONE, &description_));
   desc->SetMinSize({40*10, -1});
 
   auto* ref_table = new wxChoice(this, kIdRefTable, wxDefaultPosition,wxDefaultSize,

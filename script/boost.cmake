@@ -1,6 +1,6 @@
 # Copyright 2021 Ingemar Hedvall
 # SPDX-License-Identifier: MIT
-set (Boost_ROOT "K:/boost/boost_1_78_0" CACHE PATH "Boost C++ Library is required at build time")
+set (Boost_ROOT "K:/boost/boost_1_79_0")
 if (NOT Boost_FOUND)
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_MULTITHREADED ON)

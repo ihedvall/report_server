@@ -80,7 +80,7 @@ bool IXmlFile::WriteFile() {
     if (util::string::IEquals(encoding_, "UTF-8")) {
       file << "\xEF\xBB\xBF";
     }
-    WriteRoot(file);
+    WriteRoot(file, false);
 
     file.close();
 
@@ -91,23 +91,24 @@ bool IXmlFile::WriteFile() {
   return true;
 }
 
-std::string IXmlFile::WriteString() {
+std::string IXmlFile::WriteString(bool skip_header) {
   std::ostringstream temp;
-  WriteRoot(temp);
+  WriteRoot(temp, skip_header);
   return temp.str();
 }
 
-void IXmlFile::WriteRoot(std::ostream &dest) {
-  dest << "<?xml version='" << Version() << "' encoding='" << Encoding() << "'";
-  if (Standalone()) {
-    dest << " standalone='yes'";
-  }
-  dest << "?>" << std::endl;
+void IXmlFile::WriteRoot(std::ostream &dest, bool skip_header) {
+  if (!skip_header) {
+    dest << "<?xml version='" << Version() << "' encoding='" << Encoding() << "'";
+    if (Standalone()) {
+      dest << " standalone='yes'";
+    }
+    dest << "?>" << std::endl;
 
-  if (!style_sheet_.empty()) {
-    dest << "<?xml-stylesheet type='text/xsl' href='" << StyleSheet() << "'?>" << std::endl;
+    if (!style_sheet_.empty()) {
+      dest << "<?xml-stylesheet type='text/xsl' href='" << StyleSheet() << "'?>" << std::endl;
+    }
   }
-
   if (root_node_) {
     root_node_->Write(dest, 0);
   }

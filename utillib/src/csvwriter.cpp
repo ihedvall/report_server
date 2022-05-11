@@ -4,12 +4,19 @@
  */
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <filesystem>
 #include <boost/algorithm//string/replace.hpp>
 
 #include "util/csvwriter.h"
 #include "util/logstream.h"
+#include "util/stringutil.h"
+
+using namespace util::log;
 
 namespace {
+  static std::string kEmptyString;
+
 /**
  * Scan through the text and replace '"' with '""'.
  * @param [in,out] text Text string to check and maybe modify.
@@ -41,50 +48,76 @@ void CheckIfDittoMarkNeeded(std::string& text) {
 
 }
 
-namespace util::string {
+namespace util::plot {
 
 CsvWriter::CsvWriter(const std::string &filename)
-: file_(std::fopen(filename.c_str(), "wt")),
-  filename_(filename) {
-  if (file_ == nullptr) {
-    util::log::LOG_ERROR() << "Failed to open the CSV file. File: " << filename_;
+: filename_(filename) {
+  output_ = &text_;
+  try {
+    file_.open(filename_.c_str(), std::ofstream::out | std::ofstream::trunc);
+    if (file_.is_open()) {
+      output_ = &file_;
+    } else {
+      LOG_ERROR() << "Failed to open the CSV file. File: " << filename_;
+    }
+  } catch (const std::exception& err) {
+    LOG_ERROR() << "Failed to open the CSV file. File: " << filename_;
   }
+}
+CsvWriter::CsvWriter() {
+  output_ = &text_;
 }
 
 CsvWriter::~CsvWriter() {
-  if (file_ != nullptr) {
-    std::fclose(file_);
+  if (file_.is_open()) {
+    file_.close();
   }
 }
 
+std::string CsvWriter::FileName() const {
+  std::string name;
+  try {
+    std::filesystem::path temp(filename_);
+    name = temp.filename().string();
+  } catch (const std::exception& err) {
+    LOG_ERROR() << "Failed to retrieve the filename out of the full path. Error: " << err.what()
+      << ", File Name: " << filename_;
+  }
+  return name;
+}
 
 bool CsvWriter::IsOk() const {
-  return file_ != nullptr;
+  return file_.is_open();
 }
 
 
-void CsvWriter::AddColumnHeader(const std::string &header) {
+void CsvWriter::AddColumnHeader(const std::string &name, const std::string& unit, bool valid) {
   if (row_count_ != 0) {
-    util::log::LOG_ERROR() << "Column headers shall be added to first row. File: " << filename_;
+    LOG_ERROR() << "Column headers shall be added to first row. File: " << filename_;
     return;
   }
-  SaveText(header);
+  header_list_.emplace_back(Header{name, unit, valid});
+  std::ostringstream header;
+  header << name;
+  if (!unit.empty()) {
+    header << " [" << unit << "]";
+  }
+  SaveText(header.str());
   max_columns_ = std::max(column_count_,max_columns_);
 }
 
 void CsvWriter::SaveText(const std::string& text) {
-  if (file_ == nullptr) {
-    util::log::LOG_ERROR() << "File is not open. File: " << filename_;
+  if (output_ == nullptr) {
+    LOG_ERROR() << "File is not open. File: " << filename_;
     return;
   }
   std::string temp = text;
   ConvertDittoMark(temp); // If temp includes a '"' it needs to be replaced by a '""'
   CheckIfDittoMarkNeeded(temp); // Check if the text needs '"' at start and end.
   if (column_count_ > 0) {
-    std::fprintf(file_,",%s", temp.c_str());
-  } else {
-    std::fprintf(file_, "%s", temp.c_str());
+    *output_ << ",";
   }
+  *output_ << temp;
   ++column_count_;
 }
 
@@ -100,19 +133,37 @@ void CsvWriter::AddColumnValue(const std::string& value) {
   }
 }
 
+template<>
+void CsvWriter::AddColumnValue(const float& value) {
+  const auto temp = util::string::FloatToString(value);
+  AddColumnValue(temp);
+}
+
+template<>
+void CsvWriter::AddColumnValue(const double& value) {
+  const auto temp = util::string::DoubleToString(value);
+  AddColumnValue(temp);
+}
+
+template<>
+void CsvWriter::AddColumnValue(const bool& value) {
+  const std::string temp = value ? "1" : "0";
+  AddColumnValue(temp);
+}
+
 void CsvWriter::AddRow() {
   if (column_count_ == 0 && row_count_ == 0) {
     return; // No empty lines allowed
   }
-  if (file_ != nullptr) {
+  if (output_ != nullptr) {
     if (column_count_ < max_columns_) {
       for (auto ii = column_count_; ii < max_columns_; ++ii ) {
         if (ii > 0) {
-          fprintf(file_, ",");
+          *output_ << ",";
         }
       }
     }
-    fprintf(file_, "\r\n");
+    *output_ << std::endl;
   }
   ++row_count_;
   column_count_ = 0;
@@ -120,10 +171,66 @@ void CsvWriter::AddRow() {
 
 
 void CsvWriter::CloseFile() {
-  if (file_ != nullptr) {
-    fclose(file_);
-    file_ = nullptr;
+  if (file_.is_open()) {
+    file_.close();
   }
+  output_ = &text_;
+}
+
+void CsvWriter::OpenFile(const std::string &filename) {
+  filename_ = filename;
+  output_ = &text_;
+  try {
+    file_.open(filename_.c_str(), std::ofstream::out | std::ofstream::trunc);
+    if (file_.is_open()) {
+      output_ = &file_;
+    } else {
+      LOG_ERROR() << "Failed to open the CSV file. File: " << filename_;
+    }
+  } catch (const std::exception& err) {
+    LOG_ERROR() << "Failed to open the CSV file. File: " << filename_;
+  }
+}
+
+const std::string CsvWriter::Label(size_t index) const {
+  std::ostringstream temp;
+  temp << Name(index);
+  const auto unit = Unit(index);
+  if (!unit.empty()) {
+    temp << " [" << unit << "]";
+  }
+  return temp.str();
+}
+
+const std::string &CsvWriter::Name(size_t index) const {
+  return index < header_list_.size() ? header_list_[index].name : kEmptyString;
+}
+
+const std::string &CsvWriter::Unit(size_t index) const {
+  return index < header_list_.size() ? header_list_[index].unit : kEmptyString;
+}
+
+void CsvWriter::Reset() {
+  column_count_ = 0;
+  max_columns_ = 0;
+  row_count_ = 0;
+  header_list_.clear();
+  if (file_.is_open()) {
+    file_.close();
+  }
+  text_.str("");
+  text_.clear();
+  output_ = &text_;
+}
+
+void CsvWriter::SetColumnValid(size_t column, bool valid) {
+  if (column < header_list_.size()) {
+    header_list_[column].valid = valid;
+  }
+}
+
+bool CsvWriter::IsColumnValid(size_t column) const {
+   return column < header_list_.size() ? header_list_[column].valid : false;
 }
 
 }

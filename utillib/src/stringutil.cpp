@@ -33,6 +33,12 @@ void Trim(std::string &text) {
   boost::algorithm::trim(text);
 }
 
+std::string Trim(const std::string &text) {
+  std::string temp(text);
+  boost::algorithm::trim(temp);
+  return temp;
+}
+
 std::string FormatDouble(double value, uint8_t decimals, bool fixed, const std::string& unit) {
   // Maximize it to 20 decimals
   if (decimals > 20) {

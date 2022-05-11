@@ -94,6 +94,9 @@ class ITable {
   bool DeleteSubTable(int64_t application_id);
   void DeleteColumn(const std::string& name);
 
+  [[nodiscard]] int64_t FindNextColumnId() const;
+  [[nodiscard]] ColumnList MakeUniqueList() const;
+
   [[nodiscard]] const ITable* GetTable(int64_t application_id) const;
   [[nodiscard]] const ITable* GetTableByName(const std::string& name) const;
   [[nodiscard]] const ITable* GetTableByDbName(const std::string& name) const;
@@ -117,6 +120,8 @@ class ITable {
 
   SubTableList sub_table_list_;
   ColumnList column_list_; ///< List of columns
+
+
 };
 
 } // end namespace ods

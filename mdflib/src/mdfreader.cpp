@@ -7,7 +7,6 @@
 #include <filesystem>
 #include <thread>
 #include <chrono>
-#include <memory>
 #include <vector>
 
 #include "util/stringutil.h"
@@ -22,6 +21,7 @@
 
 
 using namespace util::log;
+using namespace util::string;
 using namespace std::chrono_literals;
 
 namespace mdf {
@@ -130,6 +130,37 @@ ChannelObserverPtr CreateChannelObserver(const IDataGroup &data_group,
   return std::move(observer);
 }
 
+ChannelObserverPtr CreateChannelObserver(const IDataGroup &dg_group, const std::string &channel_name) {
+  std::unique_ptr<IChannelObserver> observer;
+
+  const IChannelGroup* channel_group = nullptr;
+  const IChannel* channel = nullptr;
+  uint64_t nof_samples = 0;
+  const auto cg_list = dg_group.ChannelGroups();
+  for (const auto* cg_group : cg_list) {
+    if (cg_group == nullptr) {
+      continue;
+    }
+    const auto cn_list = cg_group->Channels();
+    for (const auto* cn_item : cn_list) {
+      if (cn_item == nullptr) {
+        continue;
+      }
+      if (IEquals(channel_name,cn_item->Name())) {
+        if (nof_samples <= cg_group->NofSamples()) {
+          nof_samples = cg_group->NofSamples();
+          channel_group = cg_group;
+          channel = cn_item;
+        }
+      }
+    }
+  }
+  if (channel_group != nullptr && channel != nullptr) {
+    observer = CreateChannelObserver(dg_group, *channel_group, *channel);
+  }
+  return observer;
+}
+
 void CreateChannelObserverForChannelGroup(const IDataGroup &data_group,
                                           const IChannelGroup &group,
                                           ChannelObserverList& dest) {
@@ -140,6 +171,8 @@ void CreateChannelObserverForChannelGroup(const IDataGroup &data_group,
     }
   }
 }
+
+
 
 MdfReader::MdfReader(const std::string &filename)
     : filename_(filename) {
@@ -174,8 +207,12 @@ MdfReader::MdfReader(const std::string &filename)
       util::string::IEquals(id_block->FileId(), "UnFinMF", 7)) {
     if (id_block->Version() >= 400) {
       instance_ = std::make_unique<detail::Mdf4File>(std::move(id_block));
+      instance_->Name(ShortName());
+      instance_->FileName(filename_);
     } else {
       instance_ = std::make_unique<detail::Mdf3File>(std::move(id_block));
+      instance_->Name(ShortName());
+      instance_->FileName(filename_);
     }
     if (!instance_) {
       Close();
@@ -387,6 +424,18 @@ bool MdfReader::ReadData(const IDataGroup &data_group) {
     Close();
   }
   return no_error;
+}
+
+const IDataGroup *MdfReader::GetDataGroup(size_t order) const {
+  const auto* file = GetFile();
+  if (file != nullptr) {
+    DataGroupList dg_list;
+    file->DataGroups(dg_list);
+    if (order >= 0 && order < dg_list.size()) {
+      return dg_list[order];
+    }
+  }
+  return nullptr;
 }
 
 }

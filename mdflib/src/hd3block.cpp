@@ -250,11 +250,11 @@ std::string Hd3Block::Department() const {
   return organisation_;
 }
 
-void Hd3Block::Name(const std::string &name) {
+void Hd3Block::Project(const std::string &name) {
   project_ = name;
 }
 
-std::string Hd3Block::Name() const {
+std::string Hd3Block::Project() const {
   return project_;
 }
 

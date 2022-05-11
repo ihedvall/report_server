@@ -147,7 +147,7 @@ TEST_F(TestSqlite, WriteAndRead) {
     // Create DB
   try {
     SqliteDatabase database(file.string());
-    database.OpenEx();
+    EXPECT_TRUE(database.OpenEx());
     database.ExecuteSql(kCreateDb.data());
     database.Close(true);
   } catch (const std::exception& error) {

@@ -67,7 +67,7 @@ add_library(mdf STATIC
         include/mdf/mdf3writer.h src/mdf3writer.cpp
         src/dt3block.cpp src/dt3block.h
         include/mdf/iheader.h
-        include/mdf/samplerecord.h )
+        include/mdf/samplerecord.h src/iheader.cpp)
 
 target_include_directories(mdf PUBLIC
         $<INSTALL_INTERFACE:include>

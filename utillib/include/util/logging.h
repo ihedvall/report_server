@@ -11,10 +11,11 @@
 #include <cstdio>
 #include <string>
 
-#if __has_builtin(__builtin_source_location) //__has_include("source_location")
-#include <source_location>
-#else
+// #if __has_builtin(__builtin_source_location) //__has_include("source_location")
+#if __has_include("experimental/source_location")
 #include <experimental/source_location>
+#else
+#include <source_location>
 #endif
 
 namespace util::log {
@@ -33,11 +34,10 @@ enum class LogSeverity {
  * The Loc is a wrapper around the std::location library. This library is new in C++20 and some
  * treat is as experimental.
  */
-#if __has_builtin(__builtin_source_location) //__has_include("source_location")
-
-typedef std::source_location Loc;
-#else
+#if __has_include("experimental/source_location")
 typedef std::experimental::source_location Loc;
+#else
+typedef std::source_location Loc;
 #endif
 
 void LogDebug(const Loc &loc, const char *fmt, ...); ///< Creates a debug message message
@@ -54,7 +54,7 @@ std::string FindNotepad();
 
 /** \brief Backup up a file with the 9 last changes.
  *
- * Backup a file by adding a sequence number 0..9 to the file (<file>_N.<ext>).
+ * Backup a file by adding a sequence number 0..9 to the file (file_N.<ext>).
  * @param filename Full path to the file.
  * @param remove_file If set to true the file will be renamed to file_0. If set to
  * false the file will copy its content to file_0. The latter is slower but safer.

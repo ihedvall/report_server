@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+/**
+ * Defines an interface against the listen functionality.
+ */
 #pragma once
 #include <string>
 #include <memory>
@@ -11,7 +14,10 @@
 namespace util::log {
 
 
-
+/**
+ * The IListen class defines an interface against various listen implementation objects. The class
+ * hides the implementation classes.
+ */
 class IListen {
  public:
   virtual ~IListen() = default;

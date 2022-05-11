@@ -140,7 +140,7 @@ class IXmlFile {
   virtual bool ParseString(const std::string &input); ///< Parses a string instead of a file.
   virtual void Reset(); ///< Reset the internals i.e. ready for a new parsing.
   virtual bool WriteFile();
-  std::string WriteString();
+  std::string WriteString(bool skip_header = false); ///< Creates a string that is a whole XML file.
  protected:
   IXmlFile() = default; ///< Default constructor is hidden from external users.
   std::string filename_; ///< File name with full path.
@@ -153,7 +153,7 @@ class IXmlFile {
 
   virtual std::unique_ptr<IXmlNode> CreateNode(const std::string& name);
  private:
-  void WriteRoot(std::ostream& dest);
+  void WriteRoot(std::ostream& dest, bool skip_header);
 };
 /** \brief Creates an XML object that either parse or write.
  *

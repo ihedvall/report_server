@@ -18,7 +18,12 @@ add_executable(odsconfig
         src/commonpanel.cpp src/commonpanel.h
         src/enumpanel.cpp src/enumpanel.h
         src/tablepanel.cpp src/tablepanel.h
-        src/tabledialog.cpp src/tabledialog.h src/columndialog.cpp src/columndialog.h src/databasenamevalidator.cpp src/databasenamevalidator.h src/enumdialog.cpp src/enumdialog.h src/enumitemdialog.cpp src/enumitemdialog.h src/appnamevalidator.cpp src/appnamevalidator.h)
+        src/tabledialog.cpp src/tabledialog.h
+        src/columndialog.cpp src/columndialog.h
+        src/databasenamevalidator.cpp src/databasenamevalidator.h
+        src/enumdialog.cpp src/enumdialog.h
+        src/enumitemdialog.cpp src/enumitemdialog.h
+        src/appnamevalidator.cpp src/appnamevalidator.h)
 
 
 target_include_directories(odsconfig PRIVATE ${wxWidgets_INCLUDE_DIRS})
@@ -28,7 +33,9 @@ target_include_directories(odsconfig PRIVATE "../../mdflib/include")
 target_include_directories(odsconfig PRIVATE "../../utillib/include")
 target_include_directories(odsconfig PRIVATE "../../odslib/include")
 
-target_link_options(odsconfig PRIVATE -mwindows -static )
+
+
+target_link_options(odsconfig PRIVATE -mwindows -static -fstack-protector)
 
 
 target_link_libraries(odsconfig PRIVATE ods)
@@ -38,7 +45,7 @@ target_link_libraries(odsconfig PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(odsconfig PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(odsconfig PRIVATE ${ZLIB_LIBRARIES})
 target_link_libraries(odsconfig PRIVATE ${SQLite3_LIBRARIES})
-target_link_libraries(odsconfig PRIVATE crypto )
+target_link_libraries(odsconfig PRIVATE ${OPENSSL_CRYPTO_LIBRARY} )
 target_link_libraries(odsconfig PRIVATE iconv )
 target_link_libraries(odsconfig PRIVATE bcrypt)
 target_link_libraries(odsconfig PRIVATE ws2_32)

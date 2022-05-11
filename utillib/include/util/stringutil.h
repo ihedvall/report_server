@@ -22,6 +22,7 @@ namespace util::string
   };
 
   void Trim(std::string &text);
+  [[nodiscard]] std::string Trim(const std::string &text);
 
 /// Converts a floating point value to a string using number of decimals.\n
 /// It also fix rounding and returning a fixed decimals.

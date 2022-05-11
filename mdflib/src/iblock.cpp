@@ -224,6 +224,12 @@ std::string IBlock::ReadTx4(std::FILE *file, size_t index_tx) const {
 const Md4Block *IBlock::Md4() const {
   return !md_comment_ ? nullptr : dynamic_cast<const Md4Block *> (md_comment_.get());
 }
+
+void IBlock::Md4(const std::string &xml) {
+  auto md4 = std::make_unique<Md4Block>(xml);
+  md_comment_ = std::move(md4);
+}
+
 std::string IBlock::Comment() const {
     if (!md_comment_) {
       return {};
@@ -386,6 +392,5 @@ void IBlock::UpdateLink(std::FILE *file, size_t link_index, int64_t link) {
   }
   link_list_[link_index] = link;
 }
-
 
 }

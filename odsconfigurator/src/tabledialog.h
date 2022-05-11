@@ -5,7 +5,7 @@
 
 #pragma once
 #include <wx/dialog.h>
-#include <wx/listctrl.h>
+#include <wx/treelist.h>
 #include "ods/imodel.h"
 #include <ods/baseattribute.h>
 namespace ods::gui {
@@ -21,7 +21,7 @@ class TableDialog : public wxDialog {
  private:
   ITable table_; ///< The modified table
   const IModel& model_; ///< Reference to the model
-  wxListView* base_list_ = nullptr;
+  wxTreeListCtrl* base_list_ = nullptr;
   wxImageList image_list_;
 
   int64_t application_id_ = 0;
@@ -34,7 +34,7 @@ class TableDialog : public wxDialog {
   std::vector<BaseAttribute> attr_list_;
   void FetchBaseAttribute();
   void RedrawBaseList();
-  void OnToggleSelect(wxListEvent& event);
+  void OnToggleSelect(wxTreeListEvent& event);
   void OnBaseChange(wxCommandEvent& event);
   void OnParentChange(wxCommandEvent& event);
  wxDECLARE_EVENT_TABLE();

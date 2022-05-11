@@ -2,6 +2,7 @@
  * Copyright 2021 Ingemar Hedvall
  * SPDX-License-Identifier: MIT
  */
+#include <array>
 #include "datablock.h"
 namespace mdf::detail
 {

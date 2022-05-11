@@ -19,7 +19,6 @@
 
 #include <wx/wx.h>
 #include <wx/docview.h>
-#include <wx/docmdi.h>
 #include <wx/config.h>
 #include <wx/utils.h>
 
@@ -64,7 +63,9 @@ bool OdsConfig::OnInit() {
   log_config.SubDir("report_server/log");
   log_config.BaseName("ods_config");
   log_config.CreateDefaultLogger();
-  LOG_INFO() << "Log File created. Path: " << log_config.GetLogFile();
+  LOG_DEBUG() << "Log File created. Path: " << log_config.GetLogFile();
+
+
 
   // Find the path to the 'notepad.exe'
   notepad_ = util::log::FindNotepad();

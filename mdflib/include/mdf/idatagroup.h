@@ -24,11 +24,18 @@ class IDataGroup {
   void NotifySampleObservers(size_t sample, uint64_t record_id, const std::vector<uint8_t>& record) const;
 
   void ResetSample() const;
+  void SetAsRead(bool mark_as_read = true) const {
+    mark_as_read_ = mark_as_read;
+  }
+  [[nodiscard]] bool IsRead() const {
+    return mark_as_read_;
+  }
  protected:
   mutable std::vector<ISampleObserver*> observer_list;
   virtual ~IDataGroup() = default;
 
-
+ private:
+  mutable bool mark_as_read_ = false;
 };
 
 }

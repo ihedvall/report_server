@@ -49,14 +49,15 @@ wxArrayString MakeTableList(const ods::IModel& model) {
 namespace ods::gui {
 
 wxBEGIN_EVENT_TABLE(TableDialog, wxDialog) //NOLINT
-EVT_LIST_ITEM_ACTIVATED(kIdBaseList, TableDialog::OnToggleSelect)
-EVT_CHOICE(kIdBaseType, TableDialog::OnBaseChange)
-EVT_CHOICE(kIdParentTable, TableDialog::OnParentChange)
+  EVT_TREELIST_ITEM_CHECKED(kIdBaseList, TableDialog::OnToggleSelect)
+
+  EVT_CHOICE(kIdBaseType, TableDialog::OnBaseChange)
+  EVT_CHOICE(kIdParentTable, TableDialog::OnParentChange)
 wxEND_EVENT_TABLE()
 
 TableDialog::TableDialog(wxWindow *parent, const IModel& model, const ITable& original)
 : wxDialog(parent, wxID_ANY, L"Table Dialog", wxDefaultPosition, wxDefaultSize,
-           wxDEFAULT_DIALOG_STYLE),
+           wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
   model_(model),
   table_(original),
   image_list_(16, 16, false, 2) {
@@ -65,7 +66,6 @@ TableDialog::TableDialog(wxWindow *parent, const IModel& model, const ITable& or
   if (table_.ApplicationId() == 0) {
     table_.ApplicationId(model_.FindNextTableId(table_.ParentId()));
   }
-
   wxIntegerValidator app_id_validator(&application_id_);
   app_id_validator.SetMin(1);
   auto* app_id = new wxTextCtrl(this, wxID_ANY, wxEmptyString,wxDefaultPosition,wxDefaultSize,
@@ -94,13 +94,13 @@ TableDialog::TableDialog(wxWindow *parent, const IModel& model, const ITable& or
                                   DatabaseNameValidator(&database_name_));
   db_name->SetMinSize({20*10, -1});
 
-  base_list_ = new wxListView(this, kIdBaseList, wxDefaultPosition,  wxSize( 600, 300 ),wxLC_REPORT | wxLC_SINGLE_SEL);
-  base_list_->AppendColumn("Select", wxLIST_FORMAT_LEFT, 50);
-  base_list_->AppendColumn("Name", wxLIST_FORMAT_LEFT, 150);
-  base_list_->AppendColumn("Database", wxLIST_FORMAT_LEFT, 100);
-  base_list_->AppendColumn("Base", wxLIST_FORMAT_LEFT, 150);
-  base_list_->AppendColumn("Type", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
-  base_list_->SetImageList(&image_list_, wxIMAGE_LIST_SMALL);
+  base_list_ = new wxTreeListCtrl(this, kIdBaseList, wxDefaultPosition,  wxSize( 600, 300 ),
+                                  wxTL_CHECKBOX | wxTL_SINGLE);
+  base_list_->AppendColumn("Name", 150);
+  base_list_->AppendColumn("Database", 100);
+  base_list_->AppendColumn("Base", 150);
+  base_list_->AppendColumn("Type", 100);
+  // base_list_->SetImageList(&image_list_, wxIMAGE_LIST_SMALL);
 
   auto* save_button_ = new wxButton(this, wxID_OK, wxGetStockLabel(wxID_SAVE, wxSTOCK_FOR_BUTTON));
   auto* cancel_button_ = new wxButton(this, wxID_CANCEL, wxGetStockLabel(wxID_CANCEL, wxSTOCK_FOR_BUTTON));
@@ -167,18 +167,22 @@ TableDialog::TableDialog(wxWindow *parent, const IModel& model, const ITable& or
   base_box->Add(db_name_sizer, 0, wxALIGN_LEFT | wxALL,  1);
 
   auto* base_column_box = new wxStaticBoxSizer(wxVERTICAL,this, L"Base Columns");
-  base_column_box->Add(base_list_, 1, wxALIGN_LEFT | wxALL | wxEXPAND,  1);
-
+  base_column_box->Add(base_list_, 1, wxALL | wxEXPAND,  1);
 
   auto* main_sizer = new wxBoxSizer(wxVERTICAL);
-  main_sizer->Add(app_box, 0,  wxALIGN_LEFT| wxALL | wxEXPAND, 4);
-  main_sizer->Add(base_box, 0,  wxALIGN_LEFT| wxALL | wxEXPAND, 4);
-  main_sizer->Add(base_column_box, 1,  wxALIGN_LEFT| wxALL | wxEXPAND, 4);
+  main_sizer->Add(app_box, 0,  wxALL,  4);
+  main_sizer->Add(base_box, 0,  wxALL, 4);
+  main_sizer->Add(base_column_box, 1,  wxALL | wxEXPAND, 4);
   main_sizer->Add(system_sizer, 0, wxALIGN_CENTER_HORIZONTAL | wxBOTTOM | wxLEFT | wxRIGHT, 10);
-
-  SetSizerAndFit(main_sizer);
-  save_button_->SetDefault();
   FetchBaseAttribute();
+  SetSizerAndFit(main_sizer);
+
+  auto size = GetBestSize();
+  size.IncBy(1);
+  SetInitialSize(size);
+
+  save_button_->SetDefault();
+
 }
 
 bool TableDialog::TransferDataToWindow() {
@@ -189,8 +193,11 @@ bool TableDialog::TransferDataToWindow() {
   const auto* parent_table = model_.GetTable(table_.ParentId());
   parent_ = parent_table != nullptr ? parent_table->ApplicationName() : std::string();
   database_name_ = table_.DatabaseName();
+
+  const auto transfer = wxWindowBase::TransferDataToWindow();
   RedrawBaseList();
-  return wxWindowBase::TransferDataToWindow();
+
+  return transfer;
 }
 
 bool TableDialog::TransferDataFromWindow() {
@@ -293,28 +300,29 @@ void TableDialog::RedrawBaseList() {
   }
   long row = 0;
   base_list_->DeleteAllItems();
+  auto root = base_list_->GetRootItem();
   for (const auto& attr : attr_list_) {
-    base_list_->InsertItem(row, attr.Selected() ? 1 : 0);
-    base_list_->SetItem(row, 1, attr.ApplicationName());
-    base_list_->SetItem(row, 2, attr.DatabaseName());
-    base_list_->SetItem(row, 3,attr.BaseName());
-    base_list_->SetItem(row, 4, DataTypeToUserText(attr.DataType()));
-    ++row;
+    auto item = base_list_->AppendItem(root, attr.ApplicationName());
+    base_list_->SetItemText(item, 1, attr.DatabaseName());
+    base_list_->SetItemText(item, 2,attr.BaseName());
+    base_list_->SetItemText(item, 3, DataTypeToUserText(attr.DataType()));
+    base_list_->CheckItem(item, attr.Selected() ? wxCHK_CHECKED : wxCHK_UNCHECKED);
   }
 }
 
-void TableDialog::OnToggleSelect(wxListEvent& event) {
-  const auto index = event.GetIndex();
-  if (base_list_ == nullptr || index < 0 || index >= static_cast<long>(attr_list_.size())) {
+void TableDialog::OnToggleSelect(wxTreeListEvent& event) {
+  if (base_list_ == nullptr) {
     return;
   }
-  auto& attr = attr_list_[index];
-  if (attr.Selected()) {
-    attr.Selected(false);
-    base_list_->SetItemImage(index,0);
-   } else {
-    attr.Selected(true);
-    base_list_->SetItemImage(index,1);
+  const auto item = event.GetItem();
+  const auto selected = base_list_->GetCheckedState(item) == wxCHK_CHECKED;
+  const auto app_name = base_list_->GetItemText(item).ToStdString();
+  auto itr = std::ranges::find_if(attr_list_, [&] (const auto& attr) {
+    return app_name == attr.ApplicationName();
+  });
+
+  if (itr != attr_list_.end()) {
+    itr->Selected(selected);
   }
 }
 
@@ -329,13 +337,10 @@ void TableDialog::OnBaseChange(wxCommandEvent &event) {
 
 void TableDialog::OnParentChange(wxCommandEvent &event) {
   const auto name = event.GetString().ToStdString();
-  if (name.empty()) {
-    return;
-  }
-  const auto* parent = model_.GetTableByName(name);
-  if (parent != nullptr) {
-    table_.ParentId(parent->ApplicationId());
-  }
+  const auto* parent = name.empty() ? nullptr : model_.GetTableByName(name);
+  table_.ParentId(parent == nullptr ? 0 : parent->ApplicationId());
 }
+
+
 }
 

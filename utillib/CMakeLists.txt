@@ -41,7 +41,12 @@ add_library(util STATIC
         include/util/threadsafequeue.h
         src/listenserverconnection.h src/listenserverconnection.cpp
         src/listenconfig.cpp include/util/listenconfig.h
-        src/listenclient.cpp src/listenclient.h src/listenlogger.cpp src/listenlogger.h src/writexml.cpp src/writexml.h)
+        src/listenclient.cpp src/listenclient.h
+        src/listenlogger.cpp src/listenlogger.h
+        src/writexml.cpp src/writexml.h
+        src/stringparser.cpp include/util/stringparser.h
+        src/gnuplot.cpp include/util/gnuplot.h
+        src/tempdir.cpp include/util/tempdir.h)
 
 target_include_directories(util PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -51,7 +56,11 @@ target_include_directories(util PUBLIC
 target_include_directories(util PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(util PRIVATE ${EXPAT_INCLUDE_DIRS})
 target_include_directories(util PRIVATE ${ZLIB_INCLUDE_DIRS})
-#target_include_directories(util PRIVATE ${OPENSSL_INCLUDE_DIR})
+target_include_directories(util PRIVATE ${OPENSSL_INCLUDE_DIR})
+
+if (MSVC)
+target_compile_definitions(util PRIVATE -D_WIN32_WINNT=0x0A00)
+endif()
 
 set(UTIL_PUBLIC_HEADERS
     include/util/cryptoutil.h
@@ -77,6 +86,8 @@ endif()
 
 if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") )
     set(DOXYGEN_RECURSIVE YES)
+    set(DOXYGEN_REPEAT_BRIEF NO)
+    set(DOXYGEN_HAVE_DOT YES)
     doxygen_add_docs( doc_libutil ALL
             include/util
             COMMENT "Util Library generating API documentation with Doxygen")

@@ -44,6 +44,7 @@ if (wxWidgets_FOUND )
 add_subdirectory(mdfviewer)
 add_subdirectory(listenviewer)
 add_subdirectory(odsconfigurator)
+add_subdirectory(reportexplorer)
 endif()
 
 if (wxWidgets_FOUND AND WIN32)

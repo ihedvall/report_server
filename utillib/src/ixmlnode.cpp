@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 #include <cstring>
+#include <algorithm>
 #include "util/ixmlnode.h"
 #include "util/stringutil.h"
 #include "xmlnode.h"
@@ -59,20 +60,42 @@ IXmlNode &IXmlNode::AddNode(const std::string &name) {
   return ret;
 }
 
+IXmlNode &IXmlNode::AddUniqueNode(const std::string &name) {
+  auto itr = std::ranges::find_if(node_list_, [&] (const auto& ptr) {
+    return ptr && ptr->IsTagName(name);
+  });
+  return itr != node_list_.end() ? *(itr->get()) : AddNode(name);
+}
+
+IXmlNode &IXmlNode::AddUniqueNode(const std::string &name, const std::string& key, const std::string& attr) {
+  auto itr = std::ranges::find_if(node_list_, [&] (const auto& ptr) {
+    return ptr && ptr->IsTagName(name) && ptr->IsAttribute(key, attr);
+  });
+  if (itr != node_list_.end()) {
+    return *(itr->get());
+  }
+  auto& node = AddNode(name);
+  node.SetAttribute(key, attr);
+  return node;
+}
+
 std::unique_ptr<IXmlNode> IXmlNode::CreateNode(const std::string &name) const {
   return std::make_unique<detail::XmlNode>(name);
 }
 
 const IXmlNode *IXmlNode::GetNode(const std::string &tag) const {
-  for (const auto &p: node_list_) {
-    if (!p) {
-      continue;
-    }
-    if (p->IsTagName(tag)) {
-      return p.get();
-    }
-  }
-  return nullptr;
+  const auto itr = std::ranges::find_if(node_list_, [&] (const auto& ptr) {
+    return ptr && ptr->IsTagName(tag);
+  });
+  return itr == node_list_.cend() ? nullptr : itr->get();
+}
+
+const IXmlNode *IXmlNode::GetNode(const std::string &tag, const std::string& key,
+                                  const std::string& value) const {
+  const auto itr = std::ranges::find_if(node_list_, [&] (const auto& ptr) {
+    return ptr && ptr->IsTagName(tag) && ptr->IsAttribute(key, value);
+  });
+  return itr == node_list_.cend() ? nullptr : itr->get();
 }
 
 void IXmlNode::GetChildList(IXmlNode::ChildList &child_list) const {
@@ -97,6 +120,12 @@ bool IXmlNode::IsTagName(const std::string &tag) const {
     }
   }
   return false;
+}
+
+bool IXmlNode::IsAttribute(const std::string &key, const std::string &value) const {
+  return std::ranges::any_of(attribute_list_, [&] (const auto& itr) {
+    return string::IEquals(itr.first, key) && string::IEquals(itr.second, value);
+  });
 }
 
 void IXmlNode::Write(std::ostream &dest, size_t level) { //NOLINT

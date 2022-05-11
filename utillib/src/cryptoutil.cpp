@@ -57,19 +57,17 @@ bool CreateMd5FileChecksum(const std::string &file, std::vector<uint8_t> &md5) {
   return ok;
 }
 
-bool CreateMd5FileString(const std::string& file, std::string& md5) {
+std::string CreateMd5FileString(const std::string& file) {
   std::vector<uint8_t> checksum(MD5_DIGEST_LENGTH,0);
   const auto ok = CreateMd5FileChecksum(file, checksum);
-
+  std::ostringstream temp;
   if (ok) {
-    std::ostringstream s;
     for (auto byte : checksum ) {
-      s << std::uppercase <<  std::setfill('0')
+      temp << std::uppercase <<  std::setfill('0')
         << std::setw(2) << std::hex << static_cast<uint16_t>(byte);
     }
-    md5 = s.str();
   }
-  return ok;
+  return temp.str();
 }
 
 }

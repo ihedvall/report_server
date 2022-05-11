@@ -19,14 +19,23 @@ class IHeader {
   virtual void Department(const std::string& department) = 0;
   [[nodiscard]] virtual std::string Department() const = 0;
 
-  virtual void Name(const std::string& name) = 0;
-  [[nodiscard]] virtual std::string Name() const = 0;
+  virtual void Project(const std::string& name) = 0;
+  [[nodiscard]] virtual std::string Project() const = 0;
 
   virtual void Subject(const std::string& subject) = 0;
   [[nodiscard]] virtual std::string Subject() const = 0;
 
   virtual void Description(const std::string& description) = 0;
   [[nodiscard]] virtual std::string Description() const = 0;
+
+  virtual void MeasurementId(const std::string& uuid);
+  [[nodiscard]] virtual std::string MeasurementId() const;
+
+  virtual void RecorderId(const std::string& uuid);
+  [[nodiscard]] virtual std::string RecorderId() const;
+
+  virtual void RecorderIndex(int64_t index);
+  [[nodiscard]] virtual int64_t RecorderIndex() const;
 
   virtual void StartTime(uint64_t ns_since_1970) = 0;
   [[nodiscard]] virtual uint64_t StartTime() const  = 0;
@@ -40,5 +49,6 @@ class IHeader {
  protected:
   virtual ~IHeader() = default;
 };
+
 
 } // end namespace mdf

@@ -17,8 +17,11 @@ class Mdf4File : public MdfFile {
 
   void Attachments(AttachmentList& dest) const override;
   void DataGroups(DataGroupList& dest ) const override;
+  [[nodiscard]] std::string Version() const override;
+  [[nodiscard]] std::string ProgramId() const override;
+  [[nodiscard]] IHeader* Header() const override;
 
-  const IBlock* Find(fpos_t id) const ;
+  [[nodiscard]] const IBlock* Find(fpos_t id) const ;
 
   [[nodiscard]] bool IsMdf4() const override;
 

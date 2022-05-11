@@ -9,6 +9,10 @@ Mdf4File::Mdf4File(std::unique_ptr<IdBlock> id_block)
 
 }
 
+IHeader *Mdf4File::Header() const {
+  return hd_block_.get();
+}
+
 void Mdf4File::ReadHeader(std::FILE *file) {
   if (!id_block_) {
     id_block_ = std::make_unique<IdBlock>();
@@ -89,6 +93,14 @@ void Mdf4File::DataGroups(DataGroupList &dest) const {
     for (const auto& dg4 : dg4_list) {
       dest.emplace_back(dg4.get());
     }
+}
+
+std::string Mdf4File::Version() const {
+  return !id_block_ ? "" : id_block_->VersionString();
+}
+
+std::string Mdf4File::ProgramId() const {
+  return !id_block_ ? "" : id_block_->ProgramId();
 }
 
 } // namespace mdf::detail

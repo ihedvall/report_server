@@ -64,7 +64,7 @@ TEST_F(TestWrite,Mdf3WriteHD) {
   header->Department("Home Alone");
   header->Description("Testing Header");
   header->MetaData("ABC");
-  header->Name("Mdf3WriteHD");
+  header->Project("Mdf3WriteHD");
   header->StartTime(TimeStampToNs());
   header->Subject("PXY");
 
@@ -108,7 +108,7 @@ TEST_F(TestWrite,Mdf3WriteTest1) {
   header->Department("Home Alone");
   header->Description("Testing Sample");
   header->MetaData("ABC");
-  header->Name("Mdf3WriteHD");
+  header->Project("Mdf3WriteHD");
   header->StartTime(TimeStampToNs());
   header->Subject("PXY");
 
@@ -155,7 +155,7 @@ TEST_F(TestWrite,Mdf3WriteTestValueType) {
   header->Department("Home Alone");
   header->Description("Testing Value Types");
   header->MetaData("ABC");
-  header->Name("Mdf3WriteHD");
+  header->Project("Mdf3WriteHD");
   header->StartTime(TimeStampToNs());
   header->Subject("PXY");
 

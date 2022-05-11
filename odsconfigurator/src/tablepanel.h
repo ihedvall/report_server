@@ -25,6 +25,11 @@ class TablePanel : public wxPanel {
   void OnAddColumn(wxCommandEvent &event);
   void OnEditColumn(wxCommandEvent &);
   void OnDeleteColumn(wxCommandEvent &event);
+
+  void RedrawTableList();
+  void RedrawColumnList();
+  void SelectTable(const std::string& name);
+
  private:
   wxTreeListCtrl* left_ = nullptr;
   wxListView* right_ = nullptr;
@@ -33,10 +38,6 @@ class TablePanel : public wxPanel {
   wxBitmap up_image_;
   wxBitmap down_image_;
 
-  void RedrawTableList();
-  void RedrawColumnList();
-  void SelectTable(const std::string& name);
-
   void OnTableSelect(wxTreeListEvent& event);
   void OnTableActivated(wxTreeListEvent& event);
   void OnTableRightClick(wxTreeListEvent& event);
@@ -44,6 +45,8 @@ class TablePanel : public wxPanel {
   void OnColumnActivated(wxListEvent& );
   void OnUniqueFlag(wxCommandEvent& );
   void OnNoUniqueFlag(wxCommandEvent& );
+  void OnIndexFlag(wxCommandEvent& );
+  void OnNoIndexFlag(wxCommandEvent& );
   void OnColumnUp(wxCommandEvent& );
   void OnColumnDown(wxCommandEvent& );
   void OnSizeChange(wxSizeEvent& event);

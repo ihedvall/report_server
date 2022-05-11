@@ -17,7 +17,7 @@ target_include_directories(test_mdf PRIVATE
         ${GTEST_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS})
 
-target_link_options(test_mdf PRIVATE -static )
+target_link_options(test_mdf PRIVATE -static -fstack-protector)
 
 target_link_libraries(test_mdf PRIVATE  mdf)
 target_link_libraries(test_mdf PRIVATE util)
@@ -26,7 +26,7 @@ target_link_libraries(test_mdf PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(test_mdf PRIVATE ws2_32)
 target_link_libraries(test_mdf PRIVATE mswsock)
 target_link_libraries(test_mdf PRIVATE ${ZLIB_LIBRARIES})
-target_link_libraries(test_mdf PRIVATE crypto)
+target_link_libraries(test_mdf PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
 target_link_libraries(test_mdf PRIVATE ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(test_mdf PRIVATE iconv)
 

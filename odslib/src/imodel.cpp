@@ -14,6 +14,7 @@
 using namespace util::xml;
 using namespace util::log;
 using namespace util::time;
+using namespace std::chrono;
 
 namespace {
 void ReadColumn(const IXmlNode& node, ods::ITable& table) {
@@ -161,7 +162,7 @@ void SaveColumn(const ods::IColumn& column, IXmlNode& root) {
     node.SetProperty("RefColumnName", column.ReferenceName());
   }
   if (!column.DefaultValue().empty()) {
-    node.SetProperty("DefaultValue", column.ReferenceName());
+    node.SetProperty("DefaultValue", column.DefaultValue());
   }
 }
 
@@ -424,8 +425,6 @@ void IModel::ReadTable(const IXmlNode &node) {
   AddTable(table);
 }
 
-
-
 const ITable *IModel::GetTable(int64_t application_id) const {
   const auto itr = table_list_.find(application_id);
   if (itr != table_list_.cend()) {
@@ -442,6 +441,11 @@ const ITable *IModel::GetTable(int64_t application_id) const {
 
 const IEnum *IModel::GetEnum(const std::string& name) const {
   const auto itr = enum_list_.find(name);
+  return itr == enum_list_.cend() ? nullptr : &itr->second;
+}
+
+IEnum *IModel::GetEnum(const std::string& name) {
+  auto itr = enum_list_.find(name);
   return itr == enum_list_.cend() ? nullptr : &itr->second;
 }
 
@@ -545,7 +549,7 @@ bool IModel::SaveModel(const std::string &filename) const {
   xml_file->FileName(filename);
   auto &root = xml_file->RootName("OdsModel");
   xml_file->SetProperty("Version", 2);
-  xml_file->SetProperty("Name", Name());
+  xml_file->SetProperty("NAme", Name());
   xml_file->SetProperty("ApplicationVersion", Version());
   xml_file->SetProperty("Description", Description());
   xml_file->SetProperty("CreatedBy", CreatedBy());
@@ -574,5 +578,20 @@ bool IModel::SaveModel(const std::string &filename) const {
   return xml_file->WriteFile();
 }
 
+bool IModel::IsEmpty() const {
+  return table_list_.empty();
+}
+
+int64_t IModel::FindNextEnumId() const {
+  for (int64_t next = 1; next < static_cast<int64_t>(enum_list_.size() + 10); ++next) {
+    const auto exist = std::ranges::any_of(enum_list_, [&] (const auto& itr) {
+      return itr.second.EnumId() == next;
+    });
+    if (!exist) {
+      return next;
+    }
+  }
+  return 0;
+}
 
 } // end namespace

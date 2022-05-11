@@ -20,14 +20,14 @@ target_include_directories(listenviewer PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(listenviewer PRIVATE "../../utillib/include")
 
 
-target_link_options(listenviewer PRIVATE -mwindows -static)
+target_link_options(listenviewer PRIVATE -mwindows -static -fstack-protector)
 
 target_link_libraries(listenviewer PRIVATE util)
 target_link_libraries(listenviewer PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${ZLIB_LIBRARIES})
-target_link_libraries(listenviewer PRIVATE crypto)
+target_link_libraries(listenviewer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
 target_link_libraries(listenviewer PRIVATE iconv)
 target_link_libraries(listenviewer PRIVATE bcrypt)
 target_link_libraries(listenviewer PRIVATE ws2_32)

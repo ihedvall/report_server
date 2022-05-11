@@ -72,8 +72,7 @@ TEST_F(TestZlib, FileCompress)
     GTEST_SKIP() << "Skipped Test";
   }
 
-  std::string md5_orig;
-  util::crypto::CreateMd5FileString(kTestFile, md5_orig);
+  const auto md5_orig = CreateMd5FileString(kTestFile);
 
   auto* in = fopen(kTestFile.c_str(), "rb");
   EXPECT_TRUE(in != nullptr);
@@ -94,8 +93,7 @@ TEST_F(TestZlib, FileCompress)
   fclose(in1);
   fclose(out1);
 
-  std::string md5_dest;
-  util::crypto::CreateMd5FileString(kInflateFile,md5_dest );
+  const auto md5_dest =  util::crypto::CreateMd5FileString(kInflateFile);
 
   EXPECT_EQ(md5_orig,md5_dest);
 }
