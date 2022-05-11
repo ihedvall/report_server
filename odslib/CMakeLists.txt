@@ -12,20 +12,32 @@ set(CMAKE_DEBUG_POSTFIX d)
 include("../script/boost.cmake")
 include("../script/sqlite3.cmake")
 include("../script/doxygen.cmake")
-
 add_library(ods STATIC
-        include/ods/itable.h src/itable.cpp
-        include/ods/idatabase.h
-        include/ods/databaseguard.h src/databaseguard.cpp
+        src/itable.cpp include/ods/itable.h
+        src/idatabase.cpp include/ods/idatabase.h
+        src/databaseguard.cpp include/ods/databaseguard.h
         src/sqlitedatabase.cpp src/sqlitedatabase.h
-        src/sqlitestatement.cpp src/sqlitestatement.h include/ods/odsdef.h src/imodel.cpp include/ods/imodel.h src/icolumn.cpp include/ods/icolumn.h src/irelation.cpp include/ods/irelation.h src/ienum.cpp include/ods/ienum.h src/odsdef.cpp src/idatabase.cpp src/baseattribute.cpp include/ods/baseattribute.h src/atfxfile.cpp include/ods/atfxfile.h src/iattribute.cpp include/ods/iattribute.h src/iitem.cpp include/ods/iitem.h src/ienvironment.cpp include/ods/ienvironment.h src/testdirectory.cpp src/testdirectory.h src/ienvironmentcreator.cpp include/ods/ienvironmentcreator.h src/sqlfilter.cpp include/ods/sqlfilter.h)
+        src/sqlitestatement.cpp src/sqlitestatement.h
+        src/odsdef.cpp include/ods/odsdef.h
+        src/imodel.cpp include/ods/imodel.h
+        src/icolumn.cpp include/ods/icolumn.h
+        src/irelation.cpp include/ods/irelation.h
+        src/ienum.cpp include/ods/ienum.h
+        src/baseattribute.cpp include/ods/baseattribute.h
+        src/atfxfile.cpp include/ods/atfxfile.h
+        src/iattribute.cpp include/ods/iattribute.h
+        src/iitem.cpp include/ods/iitem.h
+        src/ienvironment.cpp include/ods/ienvironment.h
+        src/testdirectory.cpp src/testdirectory.h
+        src/ienvironmentcreator.cpp include/ods/ienvironmentcreator.h
+        src/sqlfilter.cpp include/ods/sqlfilter.h)
 
 
 
 target_include_directories(ods PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(ods PRIVATE ${SQLite3_INCLUDE_DIRS})
-target_include_directories(ods PRIVATE ../utillib/include)
-target_include_directories(ods PRIVATE ../mdflib/include)
+target_include_directories(ods PRIVATE ${utillib_SOURCE_DIR}/include)
+target_include_directories(ods PRIVATE ${mdflib_SOURCE_DIR}/include)
 
 target_include_directories(ods PUBLIC
         $<INSTALL_INTERFACE:include>

@@ -20,6 +20,9 @@ include("script/zlib.cmake")
 include("script/openssl.cmake")
 include("script/expat.cmake")
 
+include("script/utillib.cmake")
+include("script/mdflib.cmake")
+
 # wxWidgets and iconv is only required to build mdfviewer
 include("script/wxwidgets.cmake")
 include("script/iconv.cmake")
@@ -30,8 +33,6 @@ include("script/doxygen.cmake")
 # googletest is only required to build unit tests
 include("script/googletest.cmake")
 
-add_subdirectory(utillib)
-add_subdirectory(mdflib)
 add_subdirectory(odslib)
 
 add_subdirectory(listend)
