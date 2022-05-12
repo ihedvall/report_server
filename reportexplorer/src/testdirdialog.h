@@ -6,7 +6,7 @@
 #pragma once
 #include <wx/wx.h>
 #include "wx/filepicker.h"
-#include "../../odslib/src/testdirectory.h"
+#include "testdirectory.h"
 namespace ods::gui {
 
 class TestDirDialog : public wxDialog {

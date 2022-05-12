@@ -12,15 +12,27 @@ add_executable(reportexplorer
         src/mainframe.cpp src/mainframe.h
         src/reportexplorer.rc
         src/reportexplorerid.h
-        src/envtab.cpp src/envtab.h src/testdirdialog.cpp src/testdirdialog.h src/envcreator.cpp src/envcreator.h src/measurementtab.cpp src/measurementtab.h src/meastreedata.cpp src/meastreedata.h src/channelpanel.cpp src/channelpanel.h src/measselectionpanel.cpp src/measselectionpanel.h src/channellistctrl.cpp src/channellistctrl.h src/selectedpanel.cpp src/selectedpanel.h src/plottab.cpp src/plottab.h src/selectedcomparator.cpp src/selectedcomparator.h src/fetchvalue.cpp src/fetchvalue.h)
+        src/envtab.cpp src/envtab.h
+        src/testdirdialog.cpp src/testdirdialog.h
+        src/envcreator.cpp src/envcreator.h
+        src/measurementtab.cpp src/measurementtab.h
+        src/meastreedata.cpp src/meastreedata.h
+        src/channelpanel.cpp src/channelpanel.h
+        src/measselectionpanel.cpp src/measselectionpanel.h
+        src/channellistctrl.cpp src/channellistctrl.h
+        src/selectedpanel.cpp src/selectedpanel.h
+        src/plottab.cpp src/plottab.h
+        src/selectedcomparator.cpp src/selectedcomparator.h
+        src/fetchvalue.cpp src/fetchvalue.h)
 
 
 target_include_directories(reportexplorer PRIVATE ${wxWidgets_INCLUDE_DIRS})
 target_include_directories(reportexplorer  PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(reportexplorer PRIVATE ${SQLite3_INCLUDE_DIRS})
-target_include_directories(reportexplorer PRIVATE "../../mdflib/include")
-target_include_directories(reportexplorer PRIVATE "../../utillib/include")
-target_include_directories(reportexplorer PRIVATE "../../odslib/include")
+target_include_directories(reportexplorer PRIVATE ${mdflib_SOURCE_DIR}/include)
+target_include_directories(reportexplorer PRIVATE ${utillib_SOURCE_DIR}/include)
+target_include_directories(reportexplorer PRIVATE ${odslib_SOURCE_DIR}/include)
+target_include_directories(reportexplorer PRIVATE ${odslib_SOURCE_DIR}/src)
 
 target_link_options(reportexplorer PRIVATE -mwindows -static -fstack-protector)
 

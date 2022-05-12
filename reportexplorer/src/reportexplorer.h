@@ -11,7 +11,7 @@
 #include <util/gnuplot.h>
 #include <ods/iitem.h>
 #include <ods/ienvironment.h>
-#include "../../odslib/src/sqlitedatabase.h"
+#include "sqlitedatabase.h"
 #include "envcreator.h"
 
 

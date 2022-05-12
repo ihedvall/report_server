@@ -22,6 +22,7 @@ include("script/expat.cmake")
 
 include("script/utillib.cmake")
 include("script/mdflib.cmake")
+include("script/odslib.cmake")
 
 # wxWidgets and iconv is only required to build mdfviewer
 include("script/wxwidgets.cmake")
@@ -31,9 +32,7 @@ include("script/iconv.cmake")
 include("script/doxygen.cmake")
 
 # googletest is only required to build unit tests
-include("script/googletest.cmake")
-
-add_subdirectory(odslib)
+#include("script/googletest.cmake")
 
 add_subdirectory(listend)
 
@@ -49,7 +48,7 @@ add_subdirectory(reportexplorer)
 endif()
 
 if (wxWidgets_FOUND AND WIN32)
-    add_subdirectory(serviceexplorer)
+add_subdirectory(serviceexplorer)
 endif()
 
 

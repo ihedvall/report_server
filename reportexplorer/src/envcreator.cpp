@@ -7,7 +7,7 @@
 
 #include <util/logstream.h>
 #include "envcreator.h"
-#include "../../odslib/src/testdirectory.h"
+#include "testdirectory.h"
 #include "reportexplorer.h"
 
 using namespace util::log;
