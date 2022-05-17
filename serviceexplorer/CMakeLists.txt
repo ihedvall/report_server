@@ -32,9 +32,3 @@ target_link_libraries(serviceexplorer PRIVATE bcrypt)
 target_link_libraries(serviceexplorer PRIVATE ws2_32)
 target_link_libraries(serviceexplorer PRIVATE mswsock)
 
-if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") )
-    set(DOXYGEN_RECURSIVE YES)
-    doxygen_add_docs( doc_serviceexplorer ALL
-            src
-            COMMENT "Service Explorer Documentation")
-endif()

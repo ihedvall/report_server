@@ -45,7 +45,13 @@ target_link_libraries(reportexplorer PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(reportexplorer PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(reportexplorer PRIVATE ${ZLIB_LIBRARIES})
 target_link_libraries(reportexplorer PRIVATE ${SQLite3_LIBRARIES})
+
+if (MINGW)
+target_link_libraries(reportexplorer PRIVATE crypto)
+else()
 target_link_libraries(reportexplorer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
+endif()
+
 
 target_link_libraries(reportexplorer PRIVATE iconv )
 target_link_libraries(reportexplorer PRIVATE bcrypt)

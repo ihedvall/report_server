@@ -17,16 +17,9 @@ target_link_libraries(listend PRIVATE util)
 target_link_libraries(listend PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(listend PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(listend PRIVATE ${ZLIB_LIBRARIES})
-target_link_libraries(listend PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
+#target_link_libraries(listend PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
 
 target_link_libraries(listend PRIVATE iconv )
 target_link_libraries(listend PRIVATE bcrypt)
 target_link_libraries(listend PRIVATE ws2_32)
 target_link_libraries(listend PRIVATE mswsock)
-
-if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") )
-    set(DOXYGEN_RECURSIVE YES)
-    doxygen_add_docs( doc_listend ALL
-            src
-            COMMENT "Listend Doxygen")
-endif()

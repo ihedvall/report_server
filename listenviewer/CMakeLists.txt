@@ -27,15 +27,9 @@ target_link_libraries(listenviewer PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${ZLIB_LIBRARIES})
-target_link_libraries(listenviewer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
+#target_link_libraries(listenviewer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
 target_link_libraries(listenviewer PRIVATE iconv)
 target_link_libraries(listenviewer PRIVATE bcrypt)
 target_link_libraries(listenviewer PRIVATE ws2_32)
 target_link_libraries(listenviewer PRIVATE mswsock)
 
-if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") )
-    set(DOXYGEN_RECURSIVE YES)
-    doxygen_add_docs( doc_listenviewer ALL
-            src
-            COMMENT "Listen Window Documentation")
-endif()

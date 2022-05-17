@@ -37,9 +37,3 @@ target_link_libraries(mdfview PRIVATE bcrypt)
 target_link_libraries(mdfview PRIVATE ws2_32)
 #target_link_libraries(mdfview PRIVATE wsock32)
 
-if (DOXYGEN_FOUND AND (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease") )
-    set(DOXYGEN_RECURSIVE YES)
-    doxygen_add_docs( doc_mdfviewer ALL
-            src
-            COMMENT "MDF VIEWER application generating API documentation with Doxygen")
-endif()

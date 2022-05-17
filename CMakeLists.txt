@@ -29,7 +29,7 @@ include("script/wxwidgets.cmake")
 include("script/iconv.cmake")
 
 # doxygen is only used to build documentation
-include("script/doxygen.cmake")
+#include("script/doxygen.cmake")
 
 # googletest is only required to build unit tests
 #include("script/googletest.cmake")

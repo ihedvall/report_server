@@ -50,11 +50,20 @@ Section  "Applications" App
   SetShellVarContext all
 
   SetOutPath "$INSTDIR\bin"
+  File "..\cmake-build-release\listend\*.exe"
+  File "..\cmake-build-release\listenviewer\*.exe"
   File "..\cmake-build-release\mdfviewer\*.exe"
-
+  File "..\cmake-build-release\odsconfigurator\odsconfig.exe"
+  File "..\cmake-build-release\reportexplorer\reportexplorer.exe"
+  File "..\cmake-build-release\serviced\serviced.exe"
+  File "..\cmake-build-release\serviceexplorer\serviceexplorer.exe"
+  
   SetOutPath "$INSTDIR\img"
   File "..\img\*.*"
-		 
+  
+  SetOutPath "$INSTDIR\model"
+  File "..\odsconfigurator\model\cachedb.xml"
+  
   ;Store installation folder
   WriteRegStr HKLM "Software\ReportServer" "" $INSTDIR
   
@@ -68,8 +77,8 @@ Section  "Applications" App
   WriteRegNone HKLM "${ARP}" "" 
   WriteRegStr HKLM "${ARP}" "InstallLocation" $INSTDIR
   WriteRegStr HKLM "${ARP}" "DisplayIcon" "$INSTDIR\img\server.ico"
-  WriteRegStr HKLM "${ARP}" "DisplayName" "Report Server 1.0" 
-  WriteRegStr HKLM "${ARP}" "DisplayVersion" "1.0.0"
+  WriteRegStr HKLM "${ARP}" "DisplayName" "Report Server 0.9"
+  WriteRegStr HKLM "${ARP}" "DisplayVersion" "0.9.0"
   WriteRegStr HKLM "${ARP}" "Publisher" "Ingemar Hedvall" 
   WriteRegDWORD HKLM "${ARP}" "NoModify" 1 
   WriteRegDWORD HKLM "${ARP}" "NoRepair" 1 
@@ -83,65 +92,69 @@ Section  "Applications" App
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
-  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\MDF Viewer.lnk" "$INSTDIR\bin\mdfview.exe" 
+  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Listen Viewer.lnk" "$INSTDIR\bin\listenviewer.exe"
+  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\MDF Viewer.lnk" "$INSTDIR\bin\mdfview.exe"
+  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\ODS Configuration.lnk" "$INSTDIR\bin\odsconfig.exe"
+  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Report Explorer.lnk" "$INSTDIR\bin\reportexplorer.exe"
+  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Service Explorer.lnk" "$INSTDIR\bin\serviceexplorer.exe"
   !insertmacro MUI_STARTMENU_WRITE_END 
 
 SectionEnd
 
-Section /o "Util Library" Util
-  SetRegView 64	
+;Section /o "Util Library" Util
+;  SetRegView 64
   
-  SetOutPath "$INSTDIR\lib"
-  File "..\cmake-build-release\utillib\libutil.a" 
-  File "..\cmake-build-debug\utillib\libutild.a"
+;  SetOutPath "$INSTDIR\lib"
+;  File "..\cmake-build-release\utillib\libutil.a"
+;  File "..\cmake-build-debug\utillib\libutild.a"
   
-  SetOutPath "$INSTDIR\include\util"
-  File "..\utillib\include\util\*.*" 
+;  SetOutPath "$INSTDIR\include\util"
+;  File "..\utillib\include\util\*.*"
   
-  SetOutPath "$INSTDIR\doc\util"
-  File /r "..\cmake-build-release\utillib\html\*.*" 
+;  SetOutPath "$INSTDIR\doc\util"
+;  File /r "..\cmake-build-release\utillib\html\*.*"
   
-  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Util Library Documentation.lnk" \
-	"$INSTDIR\doc\util\index.html" "" "$INSTDIR\img\document.ico" \
-	0 SW_SHOWNORMAL 
+;  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Util Library Documentation.lnk" \
+;	"$INSTDIR\doc\util\index.html" "" "$INSTDIR\img\document.ico" \
+;	0 SW_SHOWNORMAL
 	
-  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-  IntFmt $0 "0x%08X" $0
-  WriteRegDWORD HKLM "${ARP}" "EstimatedSize" "$0"	 
-SectionEnd
+;  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+;  IntFmt $0 "0x%08X" $0
+;  WriteRegDWORD HKLM "${ARP}" "EstimatedSize" "$0"
+;SectionEnd
 
-Section /o "MDF Library" MDF
-  SetRegView 64	
+;Section /o "MDF Library" MDF
+;  SetRegView 64
 
-  SetOutPath "$INSTDIR\lib"
-  File "..\cmake-build-release\mdflib\libmdf.a" 
-  File "..\cmake-build-debug\mdflib\libmdfd.a"
+;  SetOutPath "$INSTDIR\lib"
+;  File "..\cmake-build-release\mdflib\libmdf.a"
+;  File "..\cmake-build-debug\mdflib\libmdfd.a"
   
-  SetOutPath "$INSTDIR\include\mdf"
-  File "..\mdflib\include\mdf\*.*" 
+;  SetOutPath "$INSTDIR\include\mdf"
+;  File "..\mdflib\include\mdf\*.*"
   
-  SetOutPath "$INSTDIR\doc\mdf"
-  File /r "..\cmake-build-release\mdflib\html\*.*" 
+;  SetOutPath "$INSTDIR\doc\mdf"
+;  File /r "..\cmake-build-release\mdflib\html\*.*"
   
-  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\MDF Library Documentation.lnk" \
-	"$INSTDIR\doc\mdf\index.html" "" "$INSTDIR\img\document.ico" \
-	0 SW_SHOWNORMAL
+;  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\MDF Library Documentation.lnk" \
+;	"$INSTDIR\doc\mdf\index.html" "" "$INSTDIR\img\document.ico" \
+;	0 SW_SHOWNORMAL
 
-  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-  IntFmt $0 "0x%08X" $0
-  WriteRegDWORD HKLM "${ARP}" "EstimatedSize" "$0"	 
-SectionEnd
+;  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+;  IntFmt $0 "0x%08X" $0
+;  WriteRegDWORD HKLM "${ARP}" "EstimatedSize" "$0"
+;SectionEnd
 
 
 LangString DESC_App ${LANG_ENGLISH} "All executables."
-LangString DESC_Util ${LANG_ENGLISH} "Util Library"
-LangString DESC_MDF ${LANG_ENGLISH} "MDF Library"
+;LangString DESC_Util ${LANG_ENGLISH} "Util Library"
+;LangString DESC_MDF ${LANG_ENGLISH} "MDF Library"
 
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${App} $(DESC_App)
-  !insertmacro MUI_DESCRIPTION_TEXT ${Util} $(DESC_Util)
-  !insertmacro MUI_DESCRIPTION_TEXT ${MDF} $(DESC_MDF)
+;  !insertmacro MUI_DESCRIPTION_TEXT ${Util} $(DESC_Util)
+;  !insertmacro MUI_DESCRIPTION_TEXT ${MDF} $(DESC_MDF)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
