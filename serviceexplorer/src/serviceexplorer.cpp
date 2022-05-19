@@ -3,17 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 #include <filesystem>
-
-#ifndef __kernel_entry
-#define __kernel_entry
-#endif
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include <boost/process.hpp>
-#pragma GCC diagnostic pop
-
 #include <shellapi.h>
+
 #include <wx/wx.h>
 #include <wx/docview.h>
 

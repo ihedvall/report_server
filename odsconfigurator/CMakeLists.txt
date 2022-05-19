@@ -33,10 +33,16 @@ target_include_directories(odsconfig PRIVATE "../../mdflib/include")
 target_include_directories(odsconfig PRIVATE "../../utillib/include")
 target_include_directories(odsconfig PRIVATE "../../odslib/include")
 
+target_compile_definitions(odsconfig PRIVATE XML_STATIC)
 
-
+if (MINGW)
 target_link_options(odsconfig PRIVATE -mwindows -static -fstack-protector)
+endif()
 
+if (MSVC)
+    target_link_options(odsconfig PRIVATE /SUBSYSTEM:WINDOWS)
+    target_compile_definitions(odsconfig PRIVATE _WIN32_WINNT=0x0A00)
+endif()
 
 target_link_libraries(odsconfig PRIVATE ods)
 target_link_libraries(odsconfig PRIVATE util)
@@ -46,7 +52,10 @@ target_link_libraries(odsconfig PRIVATE ${Boost_LIBRARIES})
 target_link_libraries(odsconfig PRIVATE ${ZLIB_LIBRARIES})
 target_link_libraries(odsconfig PRIVATE ${SQLite3_LIBRARIES})
 #target_link_libraries(odsconfig PRIVATE ${OPENSSL_CRYPTO_LIBRARY} )
-target_link_libraries(odsconfig PRIVATE iconv )
+
+if (WIN32)
+#target_link_libraries(odsconfig PRIVATE iconv )
 target_link_libraries(odsconfig PRIVATE bcrypt)
 target_link_libraries(odsconfig PRIVATE ws2_32)
 #target_link_libraries(odsconfig PRIVATE wsock32)
+endif()

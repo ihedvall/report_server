@@ -18,18 +18,24 @@ add_executable(listenviewer
 target_include_directories(listenviewer PRIVATE ${wxWidgets_INCLUDE_DIRS})
 target_include_directories(listenviewer PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(listenviewer PRIVATE "../../utillib/include")
+target_compile_definitions(listenviewer PRIVATE XML_STATIC)
 
-
+if (MINGW)
 target_link_options(listenviewer PRIVATE -mwindows -static -fstack-protector)
+endif()
+
+if (MSVC)
+    target_link_options(listenviewer PRIVATE /SUBSYSTEM:WINDOWS)
+    target_compile_definitions(listenviewer PRIVATE _WIN32_WINNT=0x0A00)
+endif()
 
 target_link_libraries(listenviewer PRIVATE util)
 target_link_libraries(listenviewer PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(listenviewer PRIVATE ${Boost_LIBRARIES})
-target_link_libraries(listenviewer PRIVATE ${ZLIB_LIBRARIES})
-#target_link_libraries(listenviewer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
-target_link_libraries(listenviewer PRIVATE iconv)
+
+if (WIN32)
 target_link_libraries(listenviewer PRIVATE bcrypt)
 target_link_libraries(listenviewer PRIVATE ws2_32)
 target_link_libraries(listenviewer PRIVATE mswsock)
-
+endif()

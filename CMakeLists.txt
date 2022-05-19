@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(ReportServer
-        VERSION 0.2
+        VERSION 0.9
         DESCRIPTION "Application with ODS, MDF and HDF technology dependencies"
         LANGUAGES CXX)
 
@@ -24,15 +24,9 @@ include("script/utillib.cmake")
 include("script/mdflib.cmake")
 include("script/odslib.cmake")
 
-# wxWidgets and iconv is only required to build mdfviewer
+
 include("script/wxwidgets.cmake")
 include("script/iconv.cmake")
-
-# doxygen is only used to build documentation
-#include("script/doxygen.cmake")
-
-# googletest is only required to build unit tests
-#include("script/googletest.cmake")
 
 add_subdirectory(listend)
 

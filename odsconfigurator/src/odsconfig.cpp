@@ -3,20 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 #include <filesystem>
-
-#ifndef __kernel_entry
-#define __kernel_entry
-#endif
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include <boost/process.hpp>
-#pragma GCC diagnostic pop
 #include <boost/filesystem.hpp>
-
-#define BOOST_LOCALE_HIDE_AUTO_PTR
 #include <boost/locale.hpp>
-
 #include <wx/wx.h>
 #include <wx/docview.h>
 #include <wx/config.h>

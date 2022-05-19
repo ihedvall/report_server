@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 #include <unordered_set>
+#include <array>
 #include <wx/docmdi.h>
 #include <wx/splitter.h>
 #include "tablepanel.h"

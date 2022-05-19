@@ -19,16 +19,27 @@ target_include_directories(serviceexplorer PRIVATE ${wxWidgets_INCLUDE_DIRS})
 target_include_directories(serviceexplorer PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(serviceexplorer PRIVATE "../../utillib/include")
 
+target_compile_definitions(mdfview PRIVATE XML_STATIC)
+
+if (MINGW)
 target_link_options(serviceexplorer PRIVATE -mwindows -static)
+endif()
+
+if (MSVC)
+    target_link_options(serviceexplorer PRIVATE /SUBSYSTEM:WINDOWS)
+    target_compile_definitions(serviceexplorer PRIVATE _WIN32_WINNT=0x0A00)
+endif()
 
 target_link_libraries(serviceexplorer PRIVATE util)
 target_link_libraries(serviceexplorer PRIVATE ${EXPAT_LIBRARIES})
 target_link_libraries(serviceexplorer PRIVATE ${wxWidgets_LIBRARIES})
 target_link_libraries(serviceexplorer PRIVATE ${Boost_LIBRARIES})
-target_link_libraries(serviceexplorer PRIVATE ${ZLIB_LIBRARIES})
-target_link_libraries(serviceexplorer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
-target_link_libraries(serviceexplorer PRIVATE iconv)
+#target_link_libraries(serviceexplorer PRIVATE ${ZLIB_LIBRARIES})
+#target_link_libraries(serviceexplorer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
+
+if (WIN32)
+#target_link_libraries(serviceexplorer PRIVATE iconv)
 target_link_libraries(serviceexplorer PRIVATE bcrypt)
 target_link_libraries(serviceexplorer PRIVATE ws2_32)
 target_link_libraries(serviceexplorer PRIVATE mswsock)
-
+endif()

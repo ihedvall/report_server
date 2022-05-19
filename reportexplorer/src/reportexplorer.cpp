@@ -4,20 +4,7 @@
  */
 #include <filesystem>
 #include <algorithm>
-/*
-#ifndef __kernel_entry
-#define __kernel_entry
-#endif
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
-*/
 #include <boost/process.hpp>
-/*
-#pragma GCC diagnostic pop
-*/
-
-#define BOOST_LOCALE_HIDE_AUTO_PTR
 #include <boost/locale.hpp>
 
 #include <wx/wx.h>

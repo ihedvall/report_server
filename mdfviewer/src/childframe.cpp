@@ -73,8 +73,6 @@ fpos_t GetBlockId(const wxTreeCtrl& list, const wxTreeItemId& item) {
   return data != nullptr ? data->FilePosition() : -1;
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 wxTreeItemId FindId(const wxTreeCtrl& list, const wxTreeItemId &root, fpos_t id) {
    for (auto item = root; item.IsOk(); item = list.GetNextSibling(item)) {
     if (GetBlockId(list, item) == id) {
@@ -90,7 +88,7 @@ wxTreeItemId FindId(const wxTreeCtrl& list, const wxTreeItemId &root, fpos_t id)
   }
   return {};
 }
-#pragma clang diagnostic pop
+
 
 } // Empty namespace
 
@@ -315,8 +313,7 @@ void ChildFrame::RedrawEvent(const detail::Hd4Block &hd, const wxTreeItemId &roo
   }
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
+
 void ChildFrame::RedrawDataList(const mdf::detail::DataListBlock& dg, const wxTreeItemId& root) {
   for (const auto& data : dg.DataBlockList()) {
     if (!data) {
@@ -353,7 +350,7 @@ void ChildFrame::RedrawDataList(const mdf::detail::DataListBlock& dg, const wxTr
     }
   }
 }
-#pragma clang diagnostic pop
+
 
 void ChildFrame::RedrawCgList(const mdf::detail::Dg4Block& dg, const wxTreeItemId& root) {
   if (dg.Cg4().empty()) {
@@ -588,8 +585,7 @@ void ChildFrame::RedrawDgBlock(const detail::Dg3Block &dg3, const wxTreeItemId &
   }
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
+
 void ChildFrame::RedrawCcBlock(const detail::Cc4Block &cc, const wxTreeItemId &root) {
   std::ostringstream sub_string;
   std::string cc_name = cc.Name();
@@ -637,7 +633,6 @@ void ChildFrame::RedrawCcBlock(const detail::Cc4Block &cc, const wxTreeItemId &r
     }
   }
 }
-#pragma clang diagnostic pop
 
 void ChildFrame::RedrawCcBlock(const detail::Cc3Block &cc3, const wxTreeItemId &root) {
   std::ostringstream sub_string;
@@ -673,8 +668,6 @@ void ChildFrame::RedrawCcBlock(const detail::Cc3Block &cc3, const wxTreeItemId &
                                    TREE_CC, TREE_CC, new BlockAddress(cc3.FilePosition()));
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-no-recursion"
 void ChildFrame::RedrawChBlock(const detail::Ch4Block &ch, const wxTreeItemId &root) {
   std::ostringstream sub_string;
   std::string ch_name = ch.Name();
@@ -706,7 +699,7 @@ void ChildFrame::RedrawChBlock(const detail::Ch4Block &ch, const wxTreeItemId &r
     RedrawChBlock(*p,ch_root);
   }
 }
-#pragma clang diagnostic pop
+
 
 void ChildFrame::OnTreeSelected(wxTreeEvent& event) {
   auto selected_item = event.GetItem();

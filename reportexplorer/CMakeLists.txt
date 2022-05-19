@@ -34,8 +34,16 @@ target_include_directories(reportexplorer PRIVATE ${utillib_SOURCE_DIR}/include)
 target_include_directories(reportexplorer PRIVATE ${odslib_SOURCE_DIR}/include)
 target_include_directories(reportexplorer PRIVATE ${odslib_SOURCE_DIR}/src)
 
-target_link_options(reportexplorer PRIVATE -mwindows -static -fstack-protector)
+target_compile_definitions(reportexplorer PRIVATE XML_STATIC)
 
+if (MINGW)
+target_link_options(reportexplorer PRIVATE -mwindows -static -fstack-protector)
+endif()
+
+if (MSVC)
+    target_link_options(reportexplorer PRIVATE /SUBSYSTEM:WINDOWS)
+    target_compile_definitions(reportexplorer PRIVATE _WIN32_WINNT=0x0A00)
+endif()
 
 target_link_libraries(reportexplorer PRIVATE ods)
 target_link_libraries(reportexplorer PRIVATE mdf)
@@ -52,8 +60,9 @@ else()
 target_link_libraries(reportexplorer PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
 endif()
 
-
-target_link_libraries(reportexplorer PRIVATE iconv )
+if (WIN32)
+#target_link_libraries(reportexplorer PRIVATE iconv )
 target_link_libraries(reportexplorer PRIVATE bcrypt)
 target_link_libraries(reportexplorer PRIVATE ws2_32)
 #target_link_libraries(reportexplorer PRIVATE wsock32)
+endif()
