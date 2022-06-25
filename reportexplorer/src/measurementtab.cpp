@@ -509,7 +509,8 @@ void MeasurementTab::FetchChannelFromDb() {
       channel_filter.AddOrder(*channel_name_column, SqlCondition::OrderByAsc);
       database.FetchItemList(*channel_table, channel_list, channel_filter);
     }
-    database.FetchNameMap(*unit_table, unit_list);
+    SqlFilter no_filter;
+    database.FetchNameMap(*unit_table, unit_list, no_filter);
    } catch (const std::exception& err) {
     LOG_ERROR() << "Failed to fetch the channel list. Error: " << err.what();
     db_lock.Rollback();

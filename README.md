@@ -42,5 +42,4 @@ needs to be downloaded and built.
 
 The project uses the MIT license. See external LICENSE file in project root.
 
-The project is currently under development.
 

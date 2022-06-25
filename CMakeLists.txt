@@ -14,6 +14,8 @@ option(BUILD_DOC "If doxygen is installed, then build documentation in Release m
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_DEBUG_POSTFIX d)
 
+include(CMakePrintHelpers)
+
 # The following external libraries are required
 include("script/boost.cmake")
 include("script/zlib.cmake")
@@ -23,27 +25,20 @@ include("script/expat.cmake")
 include("script/utillib.cmake")
 include("script/mdflib.cmake")
 include("script/odslib.cmake")
-
-
 include("script/wxwidgets.cmake")
-include("script/iconv.cmake")
+# include("script/iconv.cmake")
 
-add_subdirectory(listend)
-
-if (WIN32)
-add_subdirectory(serviced)
+if (MSVC)
+    include("script/protobuf.cmake")
+    include("script/grpc.cmake")
 endif()
 
+
 if (wxWidgets_FOUND )
-add_subdirectory(mdfviewer)
-add_subdirectory(listenviewer)
-add_subdirectory(odsconfigurator)
 add_subdirectory(reportexplorer)
 endif()
 
-if (wxWidgets_FOUND AND WIN32)
-add_subdirectory(serviceexplorer)
-endif()
+
 
 
 

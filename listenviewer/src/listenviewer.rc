@@ -1,8 +1,0 @@
-#include <wx/msw/wx.rc>
-
-
-APP_ICON             ICON "img/app.ico"
-SUB_ICON             ICON "img/sub.ico"
-
-LIST                  BITMAP "img/list.bmp"
-SPLASH                RCDATA "img/splash.png"

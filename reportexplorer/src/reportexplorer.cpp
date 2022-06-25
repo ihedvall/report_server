@@ -258,7 +258,8 @@ void ReportExplorer::GetTestBedList(NameIdMap &test_bed_list) {
   if (test_bed_table != nullptr) {
     DatabaseGuard db_lock(database_);
     IdNameMap temp_list;
-    database_.FetchNameMap(*test_bed_table, temp_list);
+    SqlFilter no_filter;
+    database_.FetchNameMap(*test_bed_table, temp_list, no_filter);
     for (const auto& itr : temp_list) {
       test_bed_list.insert({itr.second, itr.first});
     }
