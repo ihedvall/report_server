@@ -34,9 +34,7 @@ if (MSVC)
 endif()
 
 
-if (wxWidgets_FOUND )
-add_subdirectory(reportexplorer)
-endif()
+
 
 
 
