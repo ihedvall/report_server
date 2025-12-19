@@ -93,3 +93,4 @@ cmake-build-*
 odsconfigurator/model/*_?.xml
 
 /.vs/
+img/*.bkp

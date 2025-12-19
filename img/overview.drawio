@@ -1,0 +1,74 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Sida-1" id="-i-Mm8F7mm-5MzBezras">
+    <mxGraphModel dx="1933" dy="851" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LXTN598vq4V2FWfX65K7-1" value="Google RPC" style="text;html=1;whiteSpace=wrap;strokeColor=#006EAF;fillColor=#1ba1e2;align=center;verticalAlign=middle;rounded=0;fontColor=#FFFFFF;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="215" y="240" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-3" value="Source Task" style="text;html=1;whiteSpace=wrap;strokeColor=#006EAF;fillColor=#1ba1e2;align=center;verticalAlign=middle;rounded=0;fontColor=#FFFFFF;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="140" y="340" width="90" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-4" value="" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#008a00;fontColor=#ffffff;strokeColor=#005700;" parent="1" vertex="1">
+          <mxGeometry x="70" y="330" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="LXTN598vq4V2FWfX65K7-4" target="LXTN598vq4V2FWfX65K7-4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-6" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="LXTN598vq4V2FWfX65K7-8" target="LXTN598vq4V2FWfX65K7-14" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="260" as="sourcePoint" />
+            <mxPoint x="440" y="210" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-7" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0;exitDx=40;exitDy=30;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="LXTN598vq4V2FWfX65K7-4" target="LXTN598vq4V2FWfX65K7-3" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="90" y="320" as="sourcePoint" />
+            <mxPoint x="140" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-8" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#008a00;fontColor=#ffffff;strokeColor=#005700;" parent="1" vertex="1">
+          <mxGeometry x="260" y="320" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-9" value="Measurement Data File" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontColor=default;convertToSvg=0;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="50" y="390" width="80" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-10" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="LXTN598vq4V2FWfX65K7-3" target="LXTN598vq4V2FWfX65K7-8" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="260" as="sourcePoint" />
+            <mxPoint x="440" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-12" value="Index Database" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontColor=default;convertToSvg=0;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="250" y="400" width="80" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="LXTN598vq4V2FWfX65K7-14" target="LXTN598vq4V2FWfX65K7-41" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-14" value="Report Task" style="text;html=1;whiteSpace=wrap;strokeColor=#006EAF;fillColor=#1ba1e2;align=center;verticalAlign=middle;rounded=0;fontColor=#FFFFFF;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="350" y="340" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-15" value="GUI" style="text;html=1;whiteSpace=wrap;strokeColor=#2D7600;fillColor=#60a917;align=center;verticalAlign=middle;rounded=0;fontColor=#ffffff;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="215" y="160" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-16" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="LXTN598vq4V2FWfX65K7-8" target="LXTN598vq4V2FWfX65K7-1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="330" as="sourcePoint" />
+            <mxPoint x="360" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LXTN598vq4V2FWfX65K7-41" value="Report Output" style="swimlane;whiteSpace=wrap;html=1;fillColor=#1BA1E2;fontColor=#ffffff;strokeColor=#006EAF;glass=0;" parent="1" vertex="1">
+          <mxGeometry x="490" y="325" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="xGsv9xsVROkO1g_4Xr9x-4" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;strokeColor=default;" parent="1" source="LXTN598vq4V2FWfX65K7-1" target="LXTN598vq4V2FWfX65K7-15" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="240" as="sourcePoint" />
+            <mxPoint x="330" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
